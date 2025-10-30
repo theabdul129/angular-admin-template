@@ -1,0 +1,222 @@
+<div class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto p-6 overflow-hidden align-middle">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-4 sm:mt-4" *ngIf="creditData">
+      <div class="flex flex-col h-86 overflow-hidden">
+        <div class="text-xl font-bold tracking-tight">Report Summary</div>
+        <mat-list>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Stated Annual Income</label>
+            <span>{{ creditData?.userDetail?.employments[0]?.netMonthlyIncome / 100 | currency : score?.employments[0].currency?.toUpperCase() || "GBP" || "N/A" }}</span></mat-list-item
+          >
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Verified Annual Income</label>
+            <span>{{ creditData?.openBankingReport?.incomeIndicator?.verifiedAnnualIncome / 100 | currency : creditData?.openBankingReport?.incomeIndicator?.currency?.toUpperCase() || "GBP" || "N/A" }}</span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Fixed Monthly Expenditure</label>
+            <span>{{ creditData?.openBankingReport?.incomeIndicator?.fixedMonthlyExpenditure / 100 | currency : creditData?.openBankingReport?.incomeIndicator?.currency?.toUpperCase() || "GBP" || "N/A" }}</span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Fixed Monthly Expenditure Percentage</label>
+            <span>{{ creditData?.openBankingReport?.incomeIndicator?.fixedMonthlyExpenditurePercentage }}%</span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Flexible Monthly Expenditure</label>
+            <span>{{ creditData?.openBankingReport?.incomeIndicator?.flexibleMonthlyExpenditure / 100 | currency : creditData?.openBankingReport?.incomeIndicator?.currency?.toUpperCase() || "GBP" || "N/A" }}</span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Flexible Monthly Expenditure Percentage</label>
+            <span>{{ creditData?.openBankingReport?.incomeIndicator?.flexibleMonthlyExpenditurePercentage }}%</span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Disposable Monthly Income</label>
+            <span>{{ creditData?.openBankingReport?.incomeIndicator?.disposableMonthlyIncome / 100 | currency : creditData?.openBankingReport?.incomeIndicator?.currency?.toUpperCase() || "GBP" || "N/A" }}</span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Disposable Monthly Income Percentage</label>
+            <span>{{ creditData?.openBankingReport?.incomeIndicator?.disposableMonthlyIncomePercentage }}%</span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Debt To Income Ratio</label>
+            <span>{{ creditData?.openBankingReport?.incomeIndicator?.debtToIncomeRatio }}%</span>
+          </mat-list-item>
+  
+          <span *ngFor="let score of creditData?.creditScores">
+            <mat-list-item class="border-b-2 tracking-tighter text-sm"
+              ><label class="w-50 opacity-50">{{ score.provider }} Credit Score </label>
+              <span>{{ score.creditScore || "N/A" }}</span>
+            </mat-list-item>
+            <mat-list-item class="border-b-2 tracking-tighter text-sm"
+              ><label class="w-50 opacity-50">Total Debt Outstanding via {{ score.provider }}</label>
+              <span>{{ score.outstandingDebt / 100 | currency : score.outstandingDebt?.currency || "GBP" || "N/A" }}</span>
+            </mat-list-item>
+          </span>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm"
+            ><label class="w-50 opacity-50">Residential Status</label>
+            <span>{{ creditData?.userDetail?.homeAddress?.residentialStatus || "N/A" }}</span>
+          </mat-list-item>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm"
+            ><label class="w-50 opacity-50">Year at Address</label>
+            <span>{{ creditData?.userDetail?.yearAtCurrentAddress || "N/A" }}</span>
+          </mat-list-item>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm"
+            ><label class="w-50 opacity-50">Post Code</label><span>{{ creditData?.userDetail?.homeAddress?.postcode || "N/A" }}</span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Address History </label>
+            <span>
+              {{ creditData?.userDetail?.yearsOfAddressHistory || "N/A" }}
+            </span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm"
+            ><label class="w-50 opacity-50">Number of dependents</label
+            ><span>
+              {{ creditData?.userDetail?.numberOfDependants || "N/A" }}
+            </span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm"
+            ><label class="w-50 opacity-50">Years Of Address History</label
+            ><span>
+              {{ creditData?.userDetail?.yearsOfAddressHistory || "N/A" }}
+            </span>
+          </mat-list-item>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm"
+            ><label class="w-50 opacity-50">Years Of Employment</label
+            ><span>
+              {{ creditData?.userDetail?.yearsOfEmployment || "N/A" }}
+            </span>
+          </mat-list-item>
+        </mat-list>
+      </div>
+  
+      <div class="flex flex-col h-86 overflow-hidden">
+        <div class="text-xl font-bold tracking-tight">Risk Indicators</div>
+        <mat-list>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Over Spending Score</label>
+            <span>{{ creditData?.openBankingReport?.riskIndicator?.overSpenderScore }}</span>
+          </mat-list-item>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Unarranged Overdraft</label>
+            <span>{{ creditData?.openBankingReport?.riskIndicator?.unarrangedOverdraftCount }}</span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Gambling</label>
+            <span>{{ creditData?.openBankingReport?.riskIndicator?.gamblingPayments / 100 | currency : creditData?.openBankingReport?.riskIndicator?.currency || "GBP" || "N/A" }}</span>
+          </mat-list-item>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Child Maintenance</label>
+            <span>{{ creditData?.openBankingReport?.riskIndicator?.childMaintenancePayments / 100 | currency : creditData?.openBankingReport?.riskIndicator?.currency || "GBP" || "N/A" }}</span>
+          </mat-list-item>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Returned Direct Debts</label>
+            <span>{{ creditData?.openBankingReport?.riskIndicator?.returnedDirectDebitsCount }}</span>
+          </mat-list-item>
+  
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">High Cost Lender</label>
+            <span>{{ creditData?.openBankingReport?.riskIndicator.highCostLenderCount }}</span>
+          </mat-list-item>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm">
+            <label class="w-50 opacity-50">Debt Collection Relationships</label>
+            <span>{{ creditData?.openBankingReport?.riskIndicator?.debtCollectionRelationshipsCount }}</span>
+          </mat-list-item>
+        </mat-list>
+      </div>
+  
+      <!-- Demographic -->
+      <div class="flex flex-col flex-auto p-6 bg-card rounded-2xl shadow">
+        <div class="flex items-center">
+          <div class="flex flex-col">
+            <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">Income Stability Score</div>
+            <div class="text-secondary font-medium">Annualised summary</div>
+          </div>
+          <div class="ml-auto -mt-2 -mr-2">
+            <button mat-icon-button [matMenuTriggerFor]="budgetMenu">
+              <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:dots-vertical'"></mat-icon>
+            </button>
+            <mat-menu #budgetMenu="matMenu">
+              <button mat-menu-item>Expenses breakdown</button>
+              <button mat-menu-item>Savings breakdown</button>
+              <button mat-menu-item>Bills breakdown</button>
+              <mat-divider class="my-2"></mat-divider>
+            </mat-menu>
+          </div>
+        </div>
+        <!-- <div class="mt-6">Last month; there were <strong>24</strong> Prime transactions, <strong>12</strong> Pear Prime entries and <strong>1</strong> Sub Prime.</div>-->
+        <div class="my-8 space-y-8">
+          <div class="flex flex-col" *ngFor="let item of incomeStabilityData">
+            <div class="flex items-center">
+              <div *ngIf="item.score < 0.5" class="flex items-center justify-center w-14 h-14 rounded bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-50">
+                <mat-icon class="text-current" [svgIcon]="'heroicons_outline:cash'"></mat-icon>
+              </div>
+              <div *ngIf="item.score > 0.5 && item.score < 0.8" class="flex items-center justify-center w-14 h-14 rounded bg-indigo-100 text-indigo-800 dark:bg-indigo-600 dark:text-indigo-50">
+                <mat-icon class="text-current" [svgIcon]="'heroicons_outline:cash'"></mat-icon>
+              </div>
+  
+              <div *ngIf="item.score > 0.8" class="flex items-center justify-center w-14 h-14 rounded bg-teal-100 text-teal-800 dark:bg-teal-600 dark:text-teal-50">
+                <mat-icon class="text-current" [svgIcon]="'heroicons_outline:cash'"></mat-icon>
+              </div>
+  
+              <div class="flex-auto ml-4 leading-none">
+                <div class="text-sm font-medium text-secondary">{{ item.years }} Years</div>
+                <!--  <div class="mt-2 font-medium text-2xl">{{ incomeData.income.oneYear }}</div>-->
+                <mat-progress-bar class="mt-3 rounded-full" [mode]="'determinate'" [value]="item.score * 100"></mat-progress-bar>
+              </div>
+              <div class="flex items-end justify-end min-w-18 mt-auto ml-6">
+                <div class="text-lg leading-none">{{ item.score }}</div>
+                <!--             <mat-icon class="text-green-600 icon-size-4 ml-1" [svgIcon]="'heroicons_solid:arrow-narrow-down'"></mat-icon> -->
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="flex items-center">
+          <div class="flex flex-col">
+            <div class="mr-4 text-lg font-medium tracking-tight leading-6 truncate">Income Liquidity Score</div>
+            <div class="text-secondary font-medium">Annualised summary</div>
+          </div>
+        </div>
+  
+        <div class="my-8 space-y-8">
+          <div class="flex flex-col" *ngFor="let item of incomeLiquidityData">
+            <div class="flex items-center">
+              <div *ngIf="item.score < 0.5" class="flex items-center justify-center w-14 h-14 rounded bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-50">
+                <mat-icon class="text-current" [svgIcon]="'heroicons_outline:cash'"></mat-icon>
+              </div>
+              <div *ngIf="item.score > 0.5 && item.score < 0.8" class="flex items-center justify-center w-14 h-14 rounded bg-indigo-100 text-indigo-800 dark:bg-indigo-600 dark:text-indigo-50">
+                <mat-icon class="text-current" [svgIcon]="'heroicons_outline:cash'"></mat-icon>
+              </div>
+  
+              <div *ngIf="item.score > 0.8" class="flex items-center justify-center w-14 h-14 rounded bg-teal-100 text-teal-800 dark:bg-teal-600 dark:text-teal-50">
+                <mat-icon class="text-current" [svgIcon]="'heroicons_outline:cash'"></mat-icon>
+              </div>
+  
+              <div class="flex-auto ml-4 leading-none">
+                <div class="text-sm font-medium text-secondary">{{ item.score }} Years</div>
+                <mat-progress-bar class="mt-3 rounded-full" [mode]="'determinate'" [value]="item.score * 50"></mat-progress-bar>
+              </div>
+              <div class="flex items-end justify-end min-w-18 mt-auto ml-6">
+                <div class="text-lg leading-none">{{ item.years }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center mt-auto">
+          <button class="mt-2" mat-stroked-button>Download Summary</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

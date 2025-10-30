@@ -1,0 +1,157 @@
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Import/write your custom styles here.
+/*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
+/* ----------------------------------------------------------------------------------------------------- */
+tr.mat-header-row.shadow > th{
+    box-shadow: 0px -1px 0px 0px #ddd inset;
+}
+
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+
+.mat-mdc-progress-spinner {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgb(255 253 253 / 70%) !important;
+    z-index: 9999999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.mdc-circular-progress--indeterminate .mdc-circular-progress__indeterminate-container {
+    width: 70px !important;
+    height: 70px !important;
+    display: flex;
+    align-items: center;
+}
+
+
+.mat-mdc-dialog-container{
+    position: relative;
+    button.close {
+        position: absolute;
+        right: 15px;
+        top: 5px;
+        font-size: 24px;
+    }
+}
+.product-thumbnail-sm{
+    height: 70px;
+    width: 70px;
+    img{
+        object-fit: contain;
+    }
+}
+app-list-product td.mat-mdc-cell.cdk-cell.cdk-column-name.mat-mdc-column-name {
+    max-width: 180px;
+}
+.catchmentTable {
+    tr th:nth-child(4), tr th:nth-child(5),
+    tr td:nth-child(4), tr td:nth-child(5){
+        width: 140px;
+    }
+}
+.product-inventory {
+    tr th:nth-child(3), tr th:nth-child(4),
+    tr td:nth-child(3), tr td:nth-child(4){
+        width: 70px;
+        padding: 0 8px;
+    }
+    span.rounded{
+        white-space: nowrap;
+    }
+}
+.iti{
+    display: block !important;
+}
+ngx-intl-tel-input.ng-dirty.ng-invalid.ng-touched input#phone{
+    border-color: red;
+}
+input#phone {
+    padding-top: 12px;
+    background: #fff;
+    padding-bottom: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    display: block;
+    width: 100%;
+    padding-left: 46px;
+}
+mat-mdc-tab-group#vertical-tabs {
+    .mat-tab-label-container{
+        display: block;
+        padding:10px;
+        border-right: solid 1px #e2e8f0;
+        background: #fff;
+    }
+    flex-direction: row;
+    .mat-mdc-tab-header{
+        max-width: 30%;
+        flex: 0 0 30%;
+    }
+    .mat-mdc-tab-body-wrapper{
+        max-width: 70%;
+        flex: 0 0 70%;
+    }
+    .mat-mdc-tab-list{
+        height: calc(100vh - 200px);
+        overflow: auto;
+    }
+    .mat-mdc-tab-labels{
+        flex-direction: column;
+        align-items: flex-start;
+        .mat-mdc-tab-label{
+            text-align: left;
+            border-radius: 10px !important;
+            text-transform: capitalize;
+        }
+    }
+    .mat-mdc-tab-header-pagination{
+        display: none;
+    }
+}
+tr.mat-header-row.shadow {
+    box-shadow: none !important;
+    th {
+        box-shadow: none !important;
+    }
+}
+th.mat-mdc-header-cell:not(:first-of-type, :last-of-type), 
+td.mat-mdc-cell:not(:first-of-type, :last-of-type), 
+td.mat-mdc-footer-cell:not(:first-of-type, :last-of-type){
+    padding: 3px 8px !important;
+}
+table.horizontalScrollable{
+    display: block;
+    overflow: auto;
+    th, td{
+        padding: 0 7px !important;
+        white-space: nowrap;
+    } 
+}
+.actions-route {
+    mat-icon {
+        height: 45px;
+        width: 45px;
+        background: #ecefff;
+        border-radius: 100%;
+        padding: 10px;
+    }
+}
+img.product-slide {
+    max-width: 100%;
+    height: 120px;
+    object-fit: contain;
+}
+.quantity-field {
+    mat-icon {
+        cursor: pointer;
+    }
+}
+.disabled {
+    pointer-events: none;
+}
+

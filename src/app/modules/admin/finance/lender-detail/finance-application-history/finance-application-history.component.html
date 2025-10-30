@@ -1,0 +1,63 @@
+<div class="flex flex-col w-full max-w-screen-xl mx-auto px-6 sm:px-8" *ngIf="historiesData?.length>0; else noData">
+    <div class="flex flex-col sm:flex-row sm:items-center min-w-0 md:my-6 sm:my-12">
+      <div class="flex flex-auto items-center min-w-0">
+        <div class="flex flex-col min-w-0 ml-4">
+          <div class="text-lg md:text-3xl font-bold">
+            History</div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="flex items-center">
+      <div class="flex-auto">
+        <div class="w-100 sm:min-w-30">
+          <mat-form-field class="w-full">
+            <mat-icon [svgIcon]="'heroicons_outline:search'"></mat-icon>
+            <input matInput [placeholder]="'Search'">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="flex">
+        <div>
+          <mat-form-field appearance="fill">
+            <mat-select [(value)]="selectedTypes">
+              <mat-option *ngFor="let type of types" [value]="type.value">
+                {{type.value}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="mx-2">
+          <button class="border p-1 rounded">
+            <mat-icon svgIcon="mat_outline:swap_vert"></mat-icon>
+          </button>
+        </div>
+      </div>
+    </div> -->
+    <mat-list>
+      <mat-list-item class="my-3" *ngFor="let history of historiesData">
+        <div class="flex flex-col sm:flex-row flex-auto sm:items-center sm:my-12">
+          <div class="flex flex-auto items-center min-w-0">
+            <!-- <mat-icon svgIcon="heroicons_solid:refresh"></mat-icon> -->
+            <div class="flex flex-col min-w-0 ml-4">
+              <div class="text-md font-semibold tracking-tight">
+                {{history?.name}} </div>    
+                <div class="text-secondary text-sm mt-1">{{history?.description}}</div>
+            </div>
+          </div>
+              <div class="flex items-center justify-between">
+                <!-- <div class="  flex-0 w-5 h-5 rounded-full overflow-hidden ">
+                  <img *ngIf="!history?.imageUrl" src="assets/images/avatars/brian-hughes.jpg" class="w-full h-full object-cover">
+                </div> -->
+                <span class="ms-2 text-sm">Created {{history?.createdAt|date:'medium'}}</span>
+              </div>
+        </div>
+        <mat-divider></mat-divider>
+      </mat-list-item>
+    </mat-list>
+  </div>
+
+  <ng-template #noData>
+    <fuse-alert class="my-4" *ngIf="historiesData?.length<1 || errorMsg" [appearance]="'outline'" [type]="'warning'">
+        {{errorMsg ? errorMsg : 'No records found'}}
+    </fuse-alert>
+</ng-template>

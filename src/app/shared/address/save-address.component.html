@@ -1,0 +1,51 @@
+<search-address id="search-address" (onSelect)="onSelect($event)"></search-address>
+
+<form [formGroup]="form">
+  <div class="grid grid-cols-1 sm:grid-cols-2 mt-4 gap-4" *ngIf="form?.value?.address1">
+    <mat-form-field class="fuse-mat-no-subscript w-full">
+      <mat-label>Address 1*</mat-label>
+      <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:location-marker'"></mat-icon>
+      <input matInput [formControlName]="'address1'" [placeholder]="'Address 1'" [spellcheck]="false">
+    </mat-form-field>
+    <mat-form-field class="fuse-mat-no-subscript w-full">
+      <mat-label>Address 2</mat-label>
+      <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:location-marker'"></mat-icon>
+      <input matInput [formControlName]="'address2'" [placeholder]="'Address 2'" [spellcheck]="false">
+    </mat-form-field>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-3 mt-8 gap-4" *ngIf="form?.value?.address1">
+    <mat-form-field class="fuse-mat-no-subscript w-full">
+      <mat-label>City*</mat-label>
+      <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+      <input matInput [formControlName]="'city'" [placeholder]="'City'" [spellcheck]="false">
+    </mat-form-field>
+    <div>
+      <search-postcode [postcode]="form.value.postcode" id="postcode"></search-postcode>
+    </div>
+    <div class="reative">
+      <mat-label class="mb-1 block">Phone Number</mat-label>
+      <ngx-intl-tel-input matInput
+        [cssClass]="'phone-field'"
+        [preferredCountries]="preferredCountries"
+        [enableAutoCountrySelect]="true"
+        [enablePlaceholder]="true"
+        [searchCountryFlag]="true"
+        [searchCountryField]="[
+        SearchCountryField.Iso2,
+        SearchCountryField.Name
+        ]"
+        [selectFirstCountry]="false"
+        [selectedCountryISO]="CountryISO.UnitedKingdom"
+        [maxLength]="15"
+        [phoneValidation]="true"
+        [separateDialCode]="separateDialCode"
+        [numberFormat]="PhoneNumberFormat.National"
+        name="phone"
+        formControlName="phoneNumber"
+      >
+    </ngx-intl-tel-input>
+  </div>
+    <input type="hidden" formControlName="longitude" id="longitude">
+    <input type="hidden" formControlName="latitude" id="latitude">
+  </div>
+</form>

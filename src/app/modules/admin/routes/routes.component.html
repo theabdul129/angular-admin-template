@@ -1,0 +1,110 @@
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+
+    <div class="relative py-8 px-6 md:px-8 border-b">
+        <div class="">
+            <div class="text-4xl font-extrabold tracking-tight">
+                Routes
+            </div>
+            <div class="mt-2 flex items-center">
+                <mat-form-field class="w-60 relative ml-3">
+                    <mat-label>Select Courier</mat-label>
+                    <mat-select [formControl]="courierCtrl" 
+                    placeholder="Courier" 
+                    [multiple]="true"  
+                    #multiSelect>
+                      <mat-option>
+                        <ngx-mat-select-search placeholderLabel="Find courier..." 
+                        noEntriesFoundLabel="No matching courier found" [formControl]="courierFilterCtrl"></ngx-mat-select-search>
+                      </mat-option>              
+                      <mat-option *ngFor="let item of filterCouriers | async" [value]="item.id">
+                        {{item.userDetail.firstName}} {{item.userDetail.surname}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                <mat-form-field class="w-60 mx-3">
+                    <mat-label>Enter a date range</mat-label>
+                    <mat-date-range-input [formGroup]="dateRange" [rangePicker]="picker">
+                        <input matStartDate formControlName="start" placeholder="Start date" #startDate>
+                        <input matEndDate formControlName="end" placeholder="End date" #endDate>
+                    </mat-date-range-input>
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker>
+                    </mat-date-range-picker>
+                </mat-form-field>
+                <button (click)="applyFilter()" class="ml-2" mat-flat-button [color]="'primary'">
+                    Apply
+                </button>
+                <button (click)="clearFilter()" class="mx-2" mat-flat-button [color]="'warn'">
+                    Clear
+                </button>
+                <button mat-flat-button [color]="'primary'">
+                    <mat-icon [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                    <span class="ml-2">Add Route</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-auto overflow-hidden">
+        <div class="flex flex-col flex-auto overflow-hidden sm:overflow-y-auto relative">
+            <table class="w-full bg-transparent" mat-table [dataSource]="dataSource">
+                <ng-container matColumnDef="account">
+                    <th mat-header-cell *matHeaderCellDef>
+                        ID
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{element.id}}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>
+                        Courier
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <a class="text-primary-500" [routerLink]="['/admin/couriers/', element.id]">
+                            {{element.userDetail?.firstName +' '+ element.userDetail?.surname}}
+                        </a>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="email">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                        Phone
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{element.userDetail?.primaryPhone}}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="number">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                        Email
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{element.userDetail?.emailAddress}}
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="action">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                        Actions
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-flat-button [routerLink]="['/admin/couriers/', element.id]" [color]="'primary'">
+                            Edit
+                        </button>
+                        <button class="ml-2" [routerLink]="[element.id]" mat-flat-button [color]="'primary'">
+                            View
+                        </button>
+                    </td>
+                </ng-container>
+                <tr class="bg-white shadow" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <tr class="order-row h-16" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+            <fuse-alert *ngIf="errorMsg" [appearance]="'border'" [type]="'warning'">
+                {{errorMsg}}
+            </fuse-alert>
+        </div>
+    </div>
+    <mat-paginator (page)="paginate($event)" [length]="totalAccounts" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+    </mat-paginator>
+</div>

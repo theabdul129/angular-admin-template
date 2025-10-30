@@ -1,0 +1,469 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent print:hidden">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/suppliers']" class="whitespace-nowrap text-primary-500">Suppliers</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Order Details</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mr-3 mt-2 flex justify-between">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    Order Details
+                </h2>
+            </div>
+            <button *ngIf="orderGenerated && orderData" class="mt-2 mr-2" (click)="print()" mat-flat-button
+                [color]="'primary'">
+                <span class="ml-2 mr-1">Print</span>
+            </button>
+            <button *ngIf="!orderGenerated" class="mt-2 mr-2" (click)="generateOrder()" mat-flat-button
+                [color]="'primary'">
+                <span class="ml-2 mr-1">View</span>
+            </button>
+            <button *ngIf="!orderDetail?.deliveredAt && !orderGenerated" class="mt-2 mr-2" (click)="deliverOrder()"
+                mat-flat-button [color]="'primary'">
+                <span class="ml-2 mr-1">Deliver</span>
+            </button>
+            <button *ngIf="!orderDetail?.completedAt && !orderGenerated" class="mt-2 mr-2" (click)="completeOrder()"
+                mat-flat-button [color]="'primary'">
+                <span class="ml-2 mr-1">Complete</span>
+            </button>
+            <button *ngIf="!orderGenerated && (!orderDetail?.deliveredAt && !orderDetail?.completedAt)"
+                class="mt-2 mr-2" (click)="openModal(modal, null)" mat-flat-button [color]="'primary'">
+                <span class="ml-2 mr-1">Add Product</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="flex-auto p-6 sm:p-10">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <div *ngIf="!orderGenerated">
+            <div class="flex" *ngIf="orderDetail">
+                <div class="flex-auto mr-7">
+                    <div class="grid grid-cols-4 gap-4 w-full mb-4">
+                        <div class="p-6 rounded-md shadow bg-card">
+                            <div class="font-medium">Order ID</div>
+                            <span
+                                class="mt-1 whitespace-normal text-secondary">{{orderDetail.purchaseOrderNumber}}</span>
+                        </div>
+                        <div class="p-6 rounded-md shadow bg-card">
+                            <div class="font-medium">Invoice Number</div>
+                            <span class="mt-1 whitespace-normal text-secondary">{{orderDetail.invoiceNumber}}</span>
+                        </div>
+                        <div class="p-6 rounded-md shadow bg-card">
+                            <div class="font-medium">Created At</div>
+                            <span class="mt-1 whitespace-normal text-secondary">{{orderDetail.createdAt | date}}</span>
+                        </div>
+                        <div class="p-6 rounded-md shadow bg-card">
+                            <div class="font-medium">Status</div>
+                            <span *ngIf="orderDetail?.orderStatus?.name == 'ORDER_CANCELLED'"
+                                class="py-0.5 px-3 rounded-full text-sm font-semibold text-pink-800 bg-pink-100 dark:text-pink-50 dark:bg-pink-500">Canceled</span>
+                            <span *ngIf="orderDetail?.orderStatus?.name == 'ORDER_COMPLETED'"
+                                class="py-0.5 px-3 rounded-full text-sm font-semibold text-green-800 bg-green-100 dark:text-green-50 dark:bg-green-500">Completed</span>
+                            <span *ngIf="orderDetail?.orderStatus?.name == 'ORDER_DELIVERED'"
+                                class="py-0.5 px-3 rounded-full text-sm font-semibold text-green-800 bg-green-100 dark:text-green-50 dark:bg-green-500">Delivered</span>
+                            <span *ngIf="orderDetail?.orderStatus?.name == 'ORDER_REFUNDED'"
+                                class="py-0.5 px-3 rounded-full text-sm font-semibold text-pink-800 bg-pink-100 dark:text-pink-50 dark:bg-pink-500">Refunded</span>
+                            <span
+                                class="py-0.5 px-3 rounded-full text-sm font-semibold text-green-800 bg-green-100 dark:text-green-50 dark:bg-green-500"
+                                *ngIf="orderDetail.deliveredAt || orderDetail?.orderStatus?.name == 'ORDER_RECEIVED'">
+                                Received
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex flex-auto overflow-hidden">
+                        <div class="flex flex-col flex-auto overflow-hidden sm:overflow-y-auto relative">
+                            <table class="w-full bg-white" mat-table [dataSource]="dataSource">
+
+                                <ng-container matColumnDef="email">
+                                    <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                        Product
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.productPrice.product.product.name || 'N/A'}}
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="id">
+                                    <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                        QTY
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.quantity}}
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="account">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        Price
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.productPrice.currency +' '+ (element.productPrice.unitPrice / 100 |
+                                        number : '1.2-2') ||
+                                        'N/A'}}
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="name">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        Tax
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.productPrice.tax.rate}}%
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="number">
+                                    <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                        Total
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        {{element.primaryPhone || 'N/A'}}
+                                    </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="action">
+                                    <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                        Actions
+                                    </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <button (click)="openModal(modal, element)" mat-flat-button [color]="'primary'">
+                                            <mat-icon [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                                        </button>
+                                        <button class="ml-2" (click)="deleteItem(element.id)" mat-flat-button
+                                            [color]="'warn'">
+                                            <mat-icon [svgIcon]="'heroicons_solid:x'"></mat-icon>
+                                        </button>
+                                    </td>
+                                </ng-container>
+
+                                <tr class="bg-white shadow" mat-header-row
+                                    *matHeaderRowDef="displayedColumns; sticky: true">
+                                </tr>
+                                <tr class="order-row h-16" mat-row *matRowDef="let row; columns: displayedColumns;">
+                                </tr>
+                            </table>
+                            <fuse-alert class="mt-4" *ngIf="errorMsg || (dataSource && dataSource.length ==0)"
+                                [appearance]="'outline'" [type]="'warning'">
+                                {{errorMsg ? errorMsg : 'No records found'}}
+                            </fuse-alert>
+                        </div>
+                    </div>
+                    <mat-paginator (page)="paginate($event)" [length]="totalAccounts" [pageSize]="10"
+                        [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+                    </mat-paginator>
+                </div>
+                <div class="flex-none w-64">
+                    <div class="p-6 rounded-md shadow bg-card">
+                        <div class="font-medium">Customer</div>
+                        <span class="mt-1 whitespace-normal text-secondary">{{orderDetail.purchaseOrderNumber}}</span>
+                        <div class="font-medium mt-5">Store</div>
+                        <a class="mt-1 whitespace-normal text-primary-500"
+                            [routerLink]="['/admin/stores/edit/',orderDetail.store.id]">{{orderDetail.store.name}}</a>
+                        <div class="font-medium mt-5">Shipping Address</div>
+                        <span
+                            class="mt-1 whitespace-normal text-secondary">{{orderDetail.store.storeAddress.address1}}</span>
+                        <div class="font-medium mt-5">Billing Address</div>
+                        <span
+                            class="mt-1 whitespace-normal text-secondary">{{orderDetail.store.storeAddress.address1}}</span>
+                        <div class="font-medium mt-5">Business Account</div>
+                        <span class="mt-2 whitespace-normal text-secondary block">
+                            <a [title]="orderDetail.term.businessAccount.legalName"
+                                [routerLink]="['/admin/business-account/edit/']">
+                                <img style="width: 70px; height: auto; object-fit: cover;"
+                                    class="rounded-1xl border border shadow"
+                                    [src]="orderDetail.term.businessAccount?.publicImageUrl"
+                                    onError="this.src='assets/images/no-image.jpg'" />
+                            </a>
+                        </span>
+                    </div>
+                    <div class="p-6 rounded-md shadow bg-card mt-5">
+                        <div class="font-medium">Activity</div>
+                        <ol>
+                            <li class="relative flex py-7" *ngIf="orderDetail.completedAt">
+                                <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600">
+                                </div>
+                                <div class="relative flex flex-auto">
+                                    <div
+                                        class="flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                        <mat-icon class="icon-size-5 text-white" [svgIcon]="'heroicons_solid:star'">
+                                        </mat-icon>
+                                    </div>
+                                    <div class="flex flex-col flex-auto items-start">
+                                        <div>Completed</div>
+                                        <div
+                                            class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 sm:space-x-2 text-md leading-5">
+                                            <div class="text-secondary">
+                                                {{orderDetail.completedAt | date: 'MMM d, y, h:mm a'}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="relative flex py-7" *ngIf="orderDetail.dispatchedAt">
+                                <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600">
+                                </div>
+                                <div class="relative flex flex-auto">
+                                    <div
+                                        class="flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                        <mat-icon class="icon-size-5 text-white" [svgIcon]="'heroicons_solid:star'">
+                                        </mat-icon>
+                                    </div>
+                                    <div class="flex flex-col flex-auto items-start">
+                                        <div>Supplier Sent</div>
+                                        <div
+                                            class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 sm:space-x-2 text-md leading-5">
+                                            <div class="text-secondary">
+                                                {{orderDetail.dispatchedAt | date: 'MMM d, y, h:mm a'}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="relative flex py-7" *ngIf="orderDetail.deliveredAt">
+                                <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600">
+                                </div>
+                                <div class="relative flex flex-auto">
+                                    <div
+                                        class="flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                        <mat-icon class="icon-size-5 text-white" [svgIcon]="'heroicons_solid:star'">
+                                        </mat-icon>
+                                    </div>
+                                    <div class="flex flex-col flex-auto items-start">
+                                        <div>Received</div>
+                                        <div
+                                            class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 sm:space-x-2 text-md leading-5">
+                                            <div class="text-secondary">
+                                                {{orderDetail.deliveredAt | date: 'MMM d, y, h:mm a'}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="relative flex py-7" *ngIf="orderDetail.paidAt">
+                                <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600">
+                                </div>
+                                <div class="relative flex flex-auto">
+                                    <div
+                                        class="flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                        <mat-icon class="icon-size-5 text-white" [svgIcon]="'heroicons_solid:star'">
+                                        </mat-icon>
+                                    </div>
+                                    <div class="flex flex-col flex-auto items-start">
+                                        <div>Paid</div>
+                                        <div
+                                            class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 sm:space-x-2 text-md leading-5">
+                                            <div class="text-secondary">
+                                                {{orderDetail.paidAt | date: 'MMM d, y, h:mm a'}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="relative flex py-7" *ngIf="orderDetail.createdAt">
+                                <div class="relative flex flex-auto">
+                                    <div
+                                        class="flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                        <mat-icon class="icon-size-5 text-white" [svgIcon]="'heroicons_solid:star'">
+                                        </mat-icon>
+                                    </div>
+                                    <div class="flex flex-col flex-auto items-start">
+                                        <div>Created</div>
+                                        <div
+                                            class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 sm:space-x-2 text-md leading-5">
+                                            <div class="text-secondary">
+                                                {{orderDetail.createdAt | date: 'MMM d, y, h:mm a'}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="orderGenerated && orderData">
+            <!-- Invoice -->
+            <div
+                class="p-6 rounded-2xl shadow bg-card print:w-auto print:rounded-none print:shadow-none print:bg-transparent">
+
+                <div class="flex items-start justify-between">
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                        <div class="text-3xl tracking-tight text-secondary">INVOICE</div>
+                        <div class="text-3xl">{{orderData.purchaseOrder.invoiceNumber}}</div>
+                        <div class="font-medium tracking-tight text-secondary">INVOICE DATE</div>
+                        <div class="font-medium">{{orderData.purchaseOrder.createdAt | date}}</div>
+                        <div class="font-medium tracking-tight text-secondary">TOTAL DUE</div>
+                        <div class="font-medium">{{orderData.pricing.currency +' '+ (orderData.pricing.total / 100 |
+                            number : '1.2-2')}}</div>
+                    </div>
+                    <div class="grid auto-cols-max grid-flow-col gap-x-8 -mr-6 py-6 px-8 rounded-l-2xl bg-accent dark">
+                        <div class="place-self-center w-24">
+                            <img class="w-24" [src]="orderData.purchaseOrder.term.businessAccount?.publicImageUrl"
+                                onError="this.src='assets/images/no-image.jpg'" />
+                        </div>
+                        <div class="pl-10 border-l text-md">
+                            <div class="font-medium">{{orderData.purchaseOrder.term.businessAccount.legalName}}</div>
+                            <div *ngIf="orderData.purchaseOrder.term.businessAccount.address">
+                                <div>{{orderData.purchaseOrder.term.businessAccount.address.address1}}</div>
+                                <div>{{orderData.purchaseOrder.term.businessAccount.address.city}},
+                                    {{orderData.purchaseOrder.term.businessAccount.address.postcode}}</div>
+                                <div>Phone: {{orderData.purchaseOrder.term.businessAccount.address.phoneNumber ||
+                                    'N/A'}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-md">
+                    <div class="text-xl font-medium">{{orderData.purchaseOrder.store.name}}</div>
+                    <div>{{orderData.purchaseOrder.store.storeAddress.address1}},
+                        {{orderData.purchaseOrder.store.storeAddress.city}},
+                        {{orderData.purchaseOrder.store.storeAddress.postcode}}</div>
+                    <!-- <div>hughes.brian@company.com</div> -->
+                    <div>Phone: {{orderData.purchaseOrder.store.storeAddress.phoneNumber || 'N/A'}}</div>
+                </div>
+
+                <div>
+                    <div class="text-xl font-medium mt-4">Shipping Info</div>
+                    <div class="grid grid-cols-4">
+                        <span>SKU: {{orderData.purchaseOrder.deliveryTerm.sku}}</span>
+                        <span>Unit Price: {{(orderData.purchaseOrder.deliveryTerm.unitPrice / 100) | number :
+                            '1.2-2'}}</span>
+                        <span>Currency: {{orderData.purchaseOrder.deliveryTerm.currency}}</span>
+                        <span>Description: {{orderData.purchaseOrder.deliveryTerm.description}}</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-x-1 mt-12">
+                    <!-- Columns -->
+                    <div class="font-medium text-md text-secondary">SKU</div>
+                    <div class="col-span-6 font-medium text-md text-secondary">PRODUCT</div>
+                    <div class="col-span-2 font-medium text-md text-right text-secondary">RATE</div>
+                    <div class="font-medium text-md text-right text-secondary">QTY</div>
+                    <div class="col-span-2 font-medium text-md text-right text-secondary">TOTAL</div>
+                </div>
+                <div *ngFor="let item of orderData.products" class="grid grid-cols-12 gap-x-1">
+                    <!-- Divider -->
+                    <div class="col-span-12 my-4 border-b"></div>
+
+                    <!-- Item -->
+                    <div class="self-center text-lg font-medium">{{item.productPrice.product.sku}}</div>
+                    <div class="col-span-6 text-lg font-medium">{{item.productPrice.product.product.name}}</div>
+                    <div class="col-span-2  self-center text-right">{{orderData.pricing.currency +' '+ (item.productPrice.unitPrice
+                        / 100 | number : '1.2-2')}}
+                    </div>
+                    <div class="self-center text-right">{{item.quantity}}</div>
+                    <div class="col-span-2 self-center text-right">{{orderData.pricing.currency +' '+
+                        (item.productPrice.unitPrice / 100 | number : '1.2-2') * item.quantity}}
+                    </div>
+                </div>
+                <div class="grid grid-cols-12 gap-x-1">
+                    <!-- Spacer -->
+                    <div class="col-span-12 mt-16"></div>
+
+                    <!-- Subtotal -->
+                    <div class="col-span-10 self-center font-medium tracking-tight text-secondary">SUBTOTAL</div>
+                    <div class="col-span-2 text-right text-lg">{{orderData.pricing.currency +' '+
+                        (orderData.pricing.productUnitPriceTotal / 100 | number : '1.2-2')}}</div>
+
+                    <!-- Divider -->
+                    <div class="col-span-12 my-3 border-b"></div>
+
+                    <!-- Tax -->
+                    <div class="col-span-10 self-center font-medium tracking-tight text-secondary">TAX</div>
+                    <div class="col-span-2 text-right text-lg">{{orderData.pricing.currency +' '+
+                        (orderData.pricing.salesTaxTotal / 100 | number : '1.2-2')}}</div>
+
+                    <!-- Divider -->
+                    <div class="col-span-12 my-3 border-b"></div>
+
+                    <!-- Discount -->
+                    <div class="col-span-10 self-center font-medium tracking-tight text-secondary">SHIPPING</div>
+                    <div class="col-span-2 text-right text-lg">{{orderData.pricing.currency +' '+
+                        (orderData.pricing.shippingCost / 100 | number : '1.2-2')}}</div>
+
+                    <!-- Divider -->
+                    <div class="col-span-12 my-3 border-b"></div>
+
+                    <!-- Total -->
+                    <div class="col-span-10 self-center text-2xl font-medium tracking-tight text-secondary">TOTAL</div>
+                    <div class="col-span-2 text-right text-2xl font-medium">{{orderData.pricing.currency +' '+
+                        (orderData.pricing.total / 100 | number : '1.2-2')}}</div>
+                </div>
+
+                <div class="mt-6">
+                    <div class="font-medium">Supplier's Notes: {{orderData.purchaseOrder.supplierNotes}}</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #modal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">
+            Product Details
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <form (ngSubmit)="onSubmit()" [formGroup]="form">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Best Before</mat-label>
+                    <input matInput [matDatepicker]="picker" [formControlName]="'bestBefore'">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Quantity</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'quantity'" [placeholder]="'quantity'" [spellcheck]="false">
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Select Supplier*</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                        [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                    <mat-select (selectionChange)="supplierChange($event)" matInput formControlName="supplier">
+                        <mat-option *ngFor="let option of suppliers" [value]="option.id">{{option.name}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Select Product</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                        [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                    <mat-select matInput formControlName="product" (selectionChange)="onChange($event)">
+                        <mat-option *ngFor="let option of products" [value]="option.id">{{option.product.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Select Product Price</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                        [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                    <mat-select matInput formControlName="productPrice">
+                        <mat-option *ngFor="let option of productPrice" [value]="option">{{(option.unitPrice / 100) |
+                            number : '1.2-2'}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <button [disabled]="form.invalid" button mat-flat-button [color]="'primary'" class="mt-3 btn btn-primary"
+                type="submit">Save</button>
+        </form>
+    </mat-dialog-content>
+</ng-template>

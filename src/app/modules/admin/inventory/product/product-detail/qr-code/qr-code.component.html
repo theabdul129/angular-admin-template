@@ -1,0 +1,194 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <!-- Header -->
+    <div
+        class="print:hidden flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent"
+    >
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a
+                        [routerLink]="['/admin/products']"
+                        class="whitespace-nowrap text-primary-500"
+                        >Products</a
+                    >
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon
+                        class="icon-size-5 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"
+                    ></mat-icon>
+                    <span class="ml-1 text-secondary"> QR Code </span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2
+                    class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"
+                >
+                    QR Code
+                </h2>
+            </div>
+        </div>
+        <button
+            class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last"
+            mat-icon-button
+            (click)="toggleDrawer()"
+        >
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="px-7 pt-4">
+        <button   (click)="print()"  style="padding: 5px !important; float:right ; margin-bottom: 5px;"   class="print:hidden btn btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer" viewBox="0 0 16 16">
+<path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"></path>
+<path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"></path>
+</svg>
+          </button>
+    </div>
+
+    <div class="flex-auto p-3">
+        <mat-spinner
+            *ngIf="isLoadingObs | async"
+            class="absolute h-full w-full"
+        ></mat-spinner>
+       
+        <div class="flex flex-column sm:flex-row">
+            <div   id="print-section"
+                class="flex-auto mr-4 print:w-auto print:rounded-none print:shadow-none print:bg-transparent"
+            >
+                <div class="bg-white p-4 border">
+                    <div
+                        class="border-bottom pb-3 mb-3 "
+                        *ngIf="selectedProduct && selectedProduct?.images.length"
+                    >
+                        <img
+                            style="max-width: 500px "
+                            class="img-thumbnail"
+                            [src]="selectedProduct.images[0]?.publicUrl"
+                        />
+
+                        <div                            class="row"    >
+                            <div class="col-4 "    *ngFor="
+                            let item of selectedProduct.images | slice : 1;
+                            let i = index
+                        ">
+                                <div class="mt-3"></div>
+                                <img style="width:100px"
+                                    class="img-thumbnail"
+                                    [src]="item.publicUrl"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 pe-5">
+                            <h2 class="text-2xl font-bold mb-1">
+                                Scan the QR code
+                            </h2>
+                            <p>
+                                Continue with this purchase via bsktpay your
+                                phone by scanning the QR Code
+                            </p>
+                            <div class="mt-3">
+                                <img
+                                    class="img-thumbnail"
+                                    style="width: 300px"
+                                    [src]="imageToShow"
+                                    *ngIf="!isImageLoading"
+                                />
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <h2 class="text-2xl font-bold mb-1">
+                                Extra Features
+                            </h2>
+                            <p>
+                                These are in addition to what this product
+                                typically comes with as standard:
+                            </p>
+                            <div class="row mt-3">
+                                <div
+                                    class="col-12"
+                                    *ngFor="let item of attributes"
+                                >
+                                    <div class="text-capitalize">
+                                        {{ item?.description }} :
+
+                                        {{  selectedProduct?.attributes?.hasOwnProperty(item?.name) &&  selectedProduct?.attributes[item?.name] ?  selectedProduct?.attributes[item?.name] :"N/A" }}
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-top pt-3 mt-3" *ngIf="accountData">
+                        <div class="row">
+                            <div class="col-2">
+                                <span
+                                    class="d-block p-3 bg-light border text-center"
+                                >
+                                    <img style="width:100px"
+                                    class="img-thumbnail"
+                                        src="{{ accountData?.publicImageUrl }}"
+                                    />
+                                </span>
+                            </div>
+                            <div class="col-9 text-end">
+                                <span class="me-3 p-3">
+                                    <strong>Tel:</strong>
+                                    <a
+                                        href="tel:{{
+                                            accountData.registeredAddress
+                                                ?.phoneNumber
+                                        }}"
+                                        >{{
+                                            accountData.registeredAddress
+                                                ?.phoneNumber
+                                        }}</a
+                                    >
+                                </span>
+                                <span>
+                                    <strong>Email:</strong>
+                                    <a
+                                        href="mailto:{{
+                                            accountData.supportEmailAddress
+                                        }}"
+                                        >{{
+                                            accountData.supportEmailAddress
+                                        }}</a
+                                    >
+                                </span>
+                                <p class="m-0">
+                                    {{ accountData.legalName }} Registered in
+                                    England with registered number
+                                    {{ accountData.companyNumber }} <br />
+                                    <span *ngIf="accountData.registeredAddress">
+                                        Registered Office:
+                                        {{
+                                            accountData.registeredAddress
+                                                .address1
+                                        }},
+                                        {{
+                                            accountData.registeredAddress.city
+                                        }},
+                                        {{
+                                            accountData.registeredAddress
+                                                .postcode
+                                        }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-none w-full sm:w-64 pr-4 sm:px-2 py-4">
+                <div class="p-5 rounded-md shadow bg-card" *ngIf="selectedProduct">
+                    <product-info [data]="selectedProduct"></product-info>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

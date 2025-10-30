@@ -1,0 +1,98 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['admin/business-account']" class="whitespace-nowrap text-primary-500">Business
+                        Account</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Bank Details</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                     Bank Account Details
+                </h2>
+            </div>
+        </div>
+        <button class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last" mat-icon-button (click)="toggleDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+
+
+    </div>
+
+    <div class="flex-auto p-6 sm:p-10">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <form [formGroup]="formGroupBankAccountDetails">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+
+              <mat-form-field>
+                <mat-label>Account Name</mat-label>
+               
+           
+                <input matInput [formControlName]="'accountName'" [type]="hideAccountName ? 'password' : 'text'"  [placeholder]="'Account Name'" [spellcheck]="false">
+                <mat-icon matSuffix (click)="hideAccountName = !hideAccountName">{{hideAccountName ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Account Number</mat-label>
+               
+           
+                <input matInput [formControlName]="'accountNumber'" [type]="hideAccountNumber ? 'password' : 'text'"   [placeholder]="'Account Number'"
+                  [spellcheck]="false">
+                  <mat-icon matSuffix (click)="hideAccountNumber = !hideAccountNumber">{{hideAccountNumber ? 'visibility_off' : 'visibility'}}</mat-icon>
+
+              </mat-form-field>
+         
+              <mat-form-field>
+                <mat-label>Sort Code</mat-label>
+               
+           
+                <input matInput [formControlName]="'sortCode'" [type]="hideSortCode ? 'password' : 'text'" [placeholder]="'Sort Code'" [spellcheck]="false">
+                <mat-icon matSuffix (click)="hideSortCode = !hideSortCode">{{hideSortCode ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Iban</mat-label>
+               
+           
+                <input matInput [formControlName]="'iban'" [type]="hideIban ? 'password' : 'text'" [placeholder]="'Iban'" [spellcheck]="false">
+                <mat-icon matSuffix (click)="hideIban = !hideIban">{{hideIban ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Bank Name</mat-label>
+               
+           
+                <input matInput [formControlName]="'bankName'"[type]="hideBankName ? 'password' : 'text'"  [placeholder]="'Bank Name'" [spellcheck]="false">
+                <mat-icon matSuffix (click)="hideBankName = !hideBankName">{{hideBankName ? 'visibility_off' : 'visibility'}}</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field class="fuse-mat-no-subscript w-full">
+                <mat-label>Select Currency</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                    [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                <mat-select   matInput [formControlName]="'currency'">
+                    <mat-option *ngFor="let option of currencyList" [value]="option">{{option}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            </div>
+           
+            <div style="float: right;">
+              <button  button mat-flat-button [disabled]="!formGroupBankAccountDetails.valid" [color]="'primary'" class="mt-7 btn btn-primary"
+              (click)="onSubmit()">
+            Update
+          </button>
+            </div>
+          
+          </form>
+    </div>
+
+
+</div>

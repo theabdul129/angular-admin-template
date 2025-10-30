@@ -1,0 +1,253 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/products']" class="whitespace-nowrap text-primary-500">Products</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Basic Details</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    Basic Details
+                </h2>
+            </div>
+            <div class="flex flex-auto mt-5 w-full justify-between" *ngIf="selectedProduct">
+                <div>
+                    <button (click)="openModal(archiveProductModal)" class="mr-2" mat-flat-button [color]="'warn'">
+                        Archive
+                    </button>
+                        <button *ngIf="!selectedProduct.approvedAt" (click)="liveProduct()" class="mr-2"
+                        mat-flat-button [color]="'primary'">
+                        Publish
+                    </button>
+                    <button *ngIf="selectedProduct.approvedAt" (click)="hideProduct()" class="mr-2"
+                        mat-flat-button [color]="'warn'">
+                        Hide Product
+                    </button>
+                </div>
+            </div>
+        </div>
+        <button class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last" mat-icon-button (click)="toggleDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="flex-auto p-6 sm:p-5">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <fuse-alert *ngIf="userForm.invalid && formSubmitted" class="my-3" [appearance]="'outline'"
+                [type]="'warning'">
+                Please fill in all the required fields.
+            </fuse-alert>
+
+        <div class="flex flex-column sm:flex-row">
+            <form (ngSubmit)="onSubmit()" [formGroup]="userForm" class="p-6 rounded border bg-white" style="width: 100%;">
+    
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="fuse-mat-no-subscript w-full">
+                        <search-product-category formControlName="productCategory"></search-product-category>
+                    </div>
+                    <div class="fuse-mat-no-subscript w-full">
+                        <search-product-brand formControlName="brand"></search-product-brand>
+                    </div>
+    
+                    <mat-form-field class="fuse-mat-no-subscript w-full">
+                        <mat-label>Name*</mat-label>
+                        <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                        </mat-icon>
+                        <input matInput [formControlName]="'name'" [placeholder]="'Name'" [spellcheck]="false">
+                    </mat-form-field>
+    
+                    <mat-form-field class="fuse-mat-no-subscript w-full">
+                        <mat-label>Product Type*</mat-label>
+                        <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+                        </mat-icon>
+                        <mat-select matInput formControlName="productType">
+                            <mat-option *ngFor="let item of productTypes" [value]="item.id">{{item.name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    
+                    <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                        <mat-label>Tax</mat-label>
+                        <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:clipboard-list'">
+                        </mat-icon>
+                        <mat-select matInput formControlName="tax">
+                          <mat-option *ngFor="let item of taxes" [value]="item.id">{{item.rate}}</mat-option>
+                      </mat-select>
+                      </mat-form-field>
+      
+                      <mat-form-field class="fuse-mat-no-subscript w-full">
+                        <mat-label>Unit Price*</mat-label>
+                        <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                        </mat-icon>
+                        <input decimalNumber matInput [formControlName]="'unitPrice'" [placeholder]="'unitPrice'" [spellcheck]="false">
+                    </mat-form-field>
+      
+                      <mat-form-field class="fuse-mat-no-subscript w-full">
+                        <mat-label>Select Currency*</mat-label>
+                        <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                            [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                        <mat-select matInput formControlName="currency">
+                            <mat-option *ngFor="let option of currencyList" [value]="option">{{option}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+      
+                      <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                        <mat-label>Stock Control</mat-label>
+                        <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:chart-bar'">
+                        </mat-icon>
+                        <mat-select matInput formControlName="stockControl" >
+                          <mat-option *ngFor="let option of stockControlList" [value]="option.name">{{option.label}}
+                          </mat-option>
+                      </mat-select>
+                      </mat-form-field>
+                      <mat-form-field class="relative">
+                        <mat-label>Store</mat-label>
+                        <mat-select [formControlName]="'storeCtrl'" 
+                        placeholder="Store" 
+                        #multiSelect>
+                          <mat-option>
+                            <ngx-mat-select-search placeholderLabel="Find Store..." 
+                            noEntriesFoundLabel="No matching store found" [formControlName]="'storeFilterCtrl'"></ngx-mat-select-search>
+                          </mat-option>              
+                          <mat-option *ngFor="let item of filterStores | async" [value]="item.id">
+                            {{item.name}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+    
+                    <div class="fuse-mat-textarea fuse-mat-no-subscript w-full mt-7">
+                        <mat-checkbox class="example-margin" [formControlName]="'ageRestriction'">Age Restriction
+                        </mat-checkbox>
+                    </div>
+    
+                    <div class="fuse-mat-textarea fuse-mat-no-subscript w-full mt-7">
+                        <mat-checkbox class="example-margin" [formControlName]="'inStock'">In stock
+                        </mat-checkbox>
+                    </div>
+                </div>
+                <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript mt-4 w-full">
+                    <mat-label>Description</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+                    </mat-icon>
+                    <textarea matInput [formControlName]="'description'" [placeholder]="'Description'" [rows]="5"
+                        [spellcheck]="false" matTextareaAutosize></textarea>
+                </mat-form-field>
+    
+                <div class="text-right">
+                    <button class="mt-4 ml-auto" mat-button [matTooltip]="'Cancel'" [routerLink]="['/admin/products']"> Cancel
+                    </button>
+                    <button mat-flat-button [color]="'primary'" class="mt-4 btn btn-primary" type="submit">Save</button>
+                </div>
+            </form>
+            <div class="flex-none w-full sm:w-64 px-2 pt-3">
+                <div class="p-5 rounded-md shadow bg-card" *ngIf="selectedProduct">
+                    <product-info [data]="selectedProduct"></product-info>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #productPackage let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title" *ngIf="selectedProductPackage">
+            Product Package: {{ selectedProductPackage.name }}
+        </h4>
+        <h4 class="mat-dialog-title" *ngIf="!selectedProductPackage">
+            New Product Package
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <app-save-product-package (onSave)="updateProductPackages()" [(packageDimension)]="selectedPackageDimension"
+            [product]="selectedProduct"></app-save-product-package>
+    </div>
+</ng-template>
+
+<ng-template #archiveProductModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Archive: {{ selectedProduct.name }}</h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to archive
+            <strong>{{ selectedProduct.name }} </strong>? You will NOT be able to use
+            this product again for any subsequent bookings or make any changes? It
+            will be disabled from all interaction
+        </p>
+    </div>
+    <div class="modal-footer mt-4">
+        <button mat-flat-button [color]="'accent'" (click)="closeModal()"
+            class="btn btn-outline-secondary" type="button">
+            Cancel
+        </button>
+        <button mat-flat-button [color]="'warn'" (click)="archiveProduct()"
+            class="ml-2 btn btn-danger" type="button">
+            Archive
+        </button>
+
+        <button *ngIf="isLoadingObs | async" class="btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #mergeProduct let-modal>
+    <form (ngSubmit)="onMergeProductSubmit()" [formGroup]="mergeProductForm">
+        <div class="modal-header">
+            <h4 class="mat-dialog-title">
+                Merge Product
+            </h4>
+            <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <mat-form-field class="fuse-mat-no-subscript w-full">
+                <mat-label>Product Id*</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                </mat-icon>
+                <input matInput [formControlName]="'productId'" [placeholder]="'Product Id'" [spellcheck]="false">
+            </mat-form-field>
+        </div>
+        <div class="modal-footer mt-4">
+            <button [disabled]="mergeProductForm.invalid" mat-flat-button [color]="'primary'"
+                class="btn-shadow btn btn-danger">Merge</button>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #productImage let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title" *ngIf="selectedProductImage">
+            Product Image: {{ selectedProductImage.description }}
+        </h4>
+        <h4 class="mat-dialog-title" *ngIf="!selectedProductImage">
+            New Product Image
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <app-save-product-image (onSave)="updateProductImages()" [(productImage)]="selectedProductImage"
+            [product]="selectedProduct"></app-save-product-image>
+    </div>
+</ng-template>

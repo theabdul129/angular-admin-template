@@ -1,0 +1,14 @@
+<div class="absolute flex flex-col w-full overflow-hidden" style="min-height: 92vh;">
+    <mat-drawer-container class="flex-auto h-full">
+        <mat-drawer class="w-60 dark:bg-gray-900" [autoFocus]="false" [mode]="screenWidth<769?'over':'side'" [opened]="drawerOpened"
+            #matDrawer>
+            <fuse-vertical-navigation [navigation]="menuData" [inner]="true" [mode]="'side'"
+                [name]="'docs-guides-navigation'" [opened]="true"></fuse-vertical-navigation>
+        </mat-drawer>
+        <mat-drawer-content class="flex flex-col" fuseScrollReset>
+            <div class="flex-auto">
+                <router-outlet></router-outlet>
+            </div>
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

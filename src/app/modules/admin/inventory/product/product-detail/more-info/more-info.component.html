@@ -1,0 +1,104 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/products']" class="whitespace-nowrap text-primary-500">Products</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">More Information</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    More Information
+                </h2>
+            </div>
+        </div>
+        <button class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last" mat-icon-button (click)="toggleDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="flex-auto p-3">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <div class="flex flex-column sm:flex-row">
+            <div class="flex-auto mr-4">
+                <form (ngSubmit)="onSubmit()" [formGroup]="userForm" class="p-6 rounded border bg-white">
+                    <div class="grid grid-cols-1 gap-4">
+                    
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" formArrayName="attributes">
+                            <div *ngFor="let item of attributes; let i = index" [formGroupName]="i">
+                                <ng-container *ngIf="item.type === 'bool';else number">
+                                    <mat-checkbox [formControlName]="'value'">{{item.description}}</mat-checkbox>
+                                </ng-container>
+                                <ng-template #number>
+                                    <ng-container *ngIf="item.type === 'number';else string">
+                                        <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                                            <mat-label>{{item.description}}</mat-label>
+                                            <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                                                [svgIcon]="'heroicons_solid:menu-alt-2'">
+                                            </mat-icon>
+                                            <input type="number" matInput [formControlName]="'value'"
+                                                [placeholder]="'value'" />
+                                        </mat-form-field>
+                                    </ng-container>
+                                </ng-template>
+                                <ng-template #string>
+                                    <ng-container *ngIf="item.type === 'string';else date">
+                                        <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                                            <mat-label>{{item.description}}</mat-label>
+                                            <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                                                [svgIcon]="'heroicons_solid:menu-alt-2'">
+                                            </mat-icon>
+                                            <input matInput [formControlName]="'value'" [placeholder]="'value'" />
+                                        </mat-form-field>
+                                    </ng-container>
+                                </ng-template>
+                                <ng-template #date>
+                                    <ng-container *ngIf="item.type === 'date';else default">
+                                        <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                                            <mat-label>{{item.description}}</mat-label>
+                                            <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                                                [svgIcon]="'heroicons_solid:menu-alt-2'">
+                                            </mat-icon>
+                                            <input matInput [formControlName]="'value'" [matDatepicker]="picker">
+                                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                            <mat-datepicker #picker></mat-datepicker>
+                                        </mat-form-field>
+                                    </ng-container>
+                                </ng-template>
+                                <ng-template #default>
+                                    <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                                        <mat-label>{{item.description}}</mat-label>
+                                        <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                                            [svgIcon]="'heroicons_solid:menu-alt-2'">
+                                        </mat-icon>
+                                        <input matInput [formControlName]="'value'" [placeholder]="'value'" />
+                                    </mat-form-field>
+                                </ng-template>
+                            </div>
+</div></div>
+                    <div class="text-right">
+                        <button class="mt-4 ml-auto" mat-button [matTooltip]="'Cancel'" [routerLink]="['/admin/products']">
+                            Cancel
+                        </button>
+                        <button mat-flat-button [color]="'primary'" class="mt-4 btn btn-primary"
+                            type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+            <div class="flex-none w-full mt-2 sm:w-64 sm:mt-0">
+                <div class="p-5 rounded-md shadow bg-card mr-4" *ngIf="selectedProduct">
+                    <product-info [data]="selectedProduct"></product-info>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

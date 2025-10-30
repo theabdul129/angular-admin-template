@@ -1,0 +1,436 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/customers']" class="whitespace-nowrap text-primary-500">Customers</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Basket</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mr-3 mt-2 ">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    Basket
+                </h2>
+                <div class="d-flex align-center">
+                    <button *ngIf="!orderGenerated" class="mt-2" mat-flat-button [color]="'primary'" (click)="openModal(modal, null)">
+                        <mat-icon [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                        Add Product
+                    </button>
+                    <button *ngIf="basketInfo?.basketProducts?.data.length>0 && !orderGenerated" class="mt-2 ml-2" (click)="openCoupon(couponModal)" mat-flat-button
+                        [color]="'primary'">
+                        <span class="ml-2 mr-1">Apply Coupon</span>
+                    </button>
+                    <button *ngIf="basketInfo?.basketProducts?.data.length>0" class="mt-2 ml-2" (click)="generateOrder()" mat-flat-button
+                        [color]="'primary'">
+                        <span class="ml-2 mr-1">View</span>
+                    </button>
+                    <button class="mt-2 ml-2" (click)="openNotifcationModal()" mat-flat-button
+                        [color]="'primary'">
+                        <mat-icon class="material-symbols-outlined">
+                            notifications_active
+                        </mat-icon>
+                        &nbsp; Send Notification
+                    </button>
+                    <!-- <button *ngIf="basketInfo?.basketProducts?.data.length>0" class="mt-2 ml-2" (click)="completeBasket()" mat-flat-button [color]="'primary'">
+                        <span class="ml-2 mr-1">Complete</span>
+                    </button> -->
+                </div>
+            </div>
+        </div>
+        <button class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last" mat-icon-button (click)="toggleDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="flex-auto p-2">
+        <fuse-alert class="mt-4" *ngIf="(isLoadingObs | async) === false && basketInfo?.basketProducts?.data.length==0" [appearance]="'outline'"
+                            [type]="'warning'">
+                            No records found
+                        </fuse-alert>
+        <mat-spinner style="z-index: 900 !important;" *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <div class="flex"  *ngIf="!orderGenerated && basketInfo?.basketProducts?.data.length>0">
+            <div class="flex-auto mr-7">
+                <div class="grid grid-cols-4 gap-4 w-full mb-4">
+                    <div class="p-6 rounded-md shadow bg-card">
+                        <div class="font-medium">Order ID</div>
+                        <span class="mt-1 whitespace-normal text-secondary">{{basketInfo?.id}}</span>
+                    </div>
+                    <!-- <div class="p-6 rounded-md shadow bg-card">
+                        <div class="font-medium">Invoice Number</div>
+                        <span class="mt-1 whitespace-normal text-secondary">{{basketInfo?.invoiceNumber}}</span>
+                    </div> -->
+                    <div class="p-6 rounded-md shadow bg-card">
+                        <div class="font-medium">Created At</div>
+                        <span class="mt-1 whitespace-normal text-secondary">{{basketInfo?.createdAt | date}}</span>
+                    </div>
+                    <!-- <div class="p-6 rounded-md shadow bg-card">
+                        <div class="font-medium">Status</div>
+                        <span *ngIf="basketInfo?.orderStatus?.name == 'ORDER_CANCELLED'"
+                            class="py-0.5 px-3 rounded-full text-sm font-semibold text-pink-800 bg-pink-100 dark:text-pink-50 dark:bg-pink-500">Canceled</span>
+                        <span *ngIf="basketInfo?.orderStatus?.name == 'ORDER_COMPLETED'"
+                            class="py-0.5 px-3 rounded-full text-sm font-semibold text-green-800 bg-green-100 dark:text-green-50 dark:bg-green-500">Completed</span>
+                        <span *ngIf="basketInfo?.orderStatus?.name == 'ORDER_DELIVERED'"
+                            class="py-0.5 px-3 rounded-full text-sm font-semibold text-green-800 bg-green-100 dark:text-green-50 dark:bg-green-500">Delivered</span>
+                        <span *ngIf="basketInfo?.orderStatus?.name == 'ORDER_REFUNDED'"
+                            class="py-0.5 px-3 rounded-full text-sm font-semibold text-pink-800 bg-pink-100 dark:text-pink-50 dark:bg-pink-500">Refunded</span>
+                        <span
+                            class="py-0.5 px-3 rounded-full text-sm font-semibold text-green-800 bg-green-100 dark:text-green-50 dark:bg-green-500"
+                            *ngIf="basketInfo?.deliveredAt || basketInfo?.orderStatus?.name == 'ORDER_RECEIVED'">
+                            Received
+                        </span>
+                    </div> -->
+                </div>
+
+                <div class="flex flex-auto">
+                    <div class="flex flex-col flex-auto overflow-auto sm:overflow-y-auto relative">
+                        <table class="w-full bg-white" mat-table [dataSource]="dataSource">
+                            <ng-container matColumnDef="id">
+                                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                    Product
+                                </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <a class="text-primary-500"
+                                        [routerLink]="['/admin/products/edit', element.product?.id]"
+                                        [color]="'primary'">
+                                        {{element.product.name}}
+                                    </a>
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="created">
+                                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                    Price
+                                </th>
+                                <td mat-cell *matCellDef="let element">
+                                    {{(element.price.unitPrice / 100) | currency: currencyType}}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="name">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    QTY
+                                </th>
+                                <td mat-cell *matCellDef="let element">
+                                    {{element.quantity}}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="term">
+                                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                    Total
+                                </th>
+                                <td mat-cell *matCellDef="let element">
+                                    {{(element.price.subTotal / 100) | currency: currencyType}}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="action">
+                                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                    Actions
+                                </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <button (click)="openModal(modal,element)" mat-flat-button [color]="'primary'">
+                                        <mat-icon [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                                    </button>
+                                    <button (click)="deleteBasket(element.product.id)" mat-flat-button [color]="'warn'"
+                                        class="ml-2">
+                                        <mat-icon [svgIcon]="'heroicons_solid:x'"></mat-icon>
+                                    </button>
+                                </td>
+                            </ng-container>
+
+                            <tr class="bg-white shadow" mat-header-row
+                                *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                            <tr class="order-row h-16" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                        <fuse-alert class="m-4" *ngIf="errorMsg || dataSource.length == 0" [appearance]="'outline'"
+                            [type]="'warning'">
+                            {{errorMsg ? errorMsg : 'No records found'}}
+                        </fuse-alert>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-none w-64">
+                <div class="p-6 rounded-md shadow bg-card">
+                    <div class="font-medium mt-5">Store</div>
+                    <a class="mt-1 whitespace-normal text-primary-500"
+                        [routerLink]="['']">{{basketInfo?.store?.name || 'N/A'}}</a>
+                    <div class="font-medium mt-5">Shipping Address
+                        <i class="align-middle cursor-pointer" (click)="addDelivery(deliveryModal)">
+                            <mat-icon [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                        </i>
+                    </div>
+                    <span
+                        class="mt-1 whitespace-normal cursor-pointer text-primary-500" (click)="gotToAllAddresses()">{{basketInfo?.deliveryAddress?.address1|| 'N/A'}}</span>
+                    <div class="font-medium mt-5">Billing Address
+                        <i class="align-middle cursor-pointer" (click)="addDelivery(billingAddressModal)">
+                            <mat-icon [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                        </i>
+                    </div>
+                    <span
+                        class="mt-1 whitespace-normal cursor-pointer text-primary-500" (click)="gotToAllAddresses()">{{basketInfo?.billingAddress?.address1 || 'N/A'}}</span>
+                    <div class="font-medium mt-5">Business Account</div>
+                    <span class="mt-2 whitespace-normal text-secondary block">
+                        <a [title]="" [routerLink]="['/admin/business-account/edit']">
+                            <img style="width: 70px; height: auto; object-fit: cover;"
+                                class="rounded-1xl border border shadow" [src]="businessAccount?.publicImageUrl"
+                                onError="this.src='assets/images/no-image.jpg'" />
+                            <div class="mt-1">{{businessAccount?.legalName}}</div>
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="orderGenerated">
+            <!-- Invoice -->
+            <div
+                class="p-6 rounded-2xl shadow bg-card print:w-auto print:rounded-none print:shadow-none print:bg-transparent">
+
+                <div class="flex items-start justify-between">
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                        <div class="text-3xl tracking-tight text-secondary">INVOICE</div>
+                        <div class="text-3xl">{{orderData?.purchaseOrder?.invoiceNumber}}</div>
+                        <div class="font-medium tracking-tight text-secondary">INVOICE DATE</div>
+                        <div class="font-medium">{{orderData?.purchaseOrder?.createdAt | date}}</div>
+                        <div class="font-medium tracking-tight text-secondary">TOTAL DUE</div>
+                        <div class="font-medium">{{(orderData?.pricing?.total / 100) | currency : orderData?.pricing?.currency}}</div>
+                    </div>
+                    <div class="grid auto-cols-max grid-flow-col gap-x-8 -mr-6 py-6 px-8 rounded-l-2xl bg-accent dark">
+                        <div class="place-self-center w-24">
+                            <img class="w-24" [src]="orderData?.purchaseOrder?.term?.businessAccount?.publicImageUrl"
+                                onError="this.src='assets/images/no-image.jpg'" />
+                        </div>
+                        <div class="pl-10 border-l text-md">
+                            <div class="font-medium">{{orderData?.purchaseOrder?.term?.businessAccount?.legalName}}</div>
+                            <div *ngIf="orderData?.purchaseOrder?.term?.businessAccount?.address">
+                                <div>{{orderData?.purchaseOrder?.term?.businessAccount?.address.address1}}</div>
+                                <div>{{orderData?.purchaseOrder?.term?.businessAccount?.address.city}},
+                                    {{orderData?.purchaseOrder?.term?.businessAccount?.address.postcode}}</div>
+                                <div>Phone: {{orderData?.purchaseOrder?.term?.businessAccount?.address.phoneNumber ||
+                                    'N/A'}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-md">
+                    <div class="text-xl font-medium">{{orderData?.purchaseOrder?.store.name}}</div>
+                    <div>{{orderData?.purchaseOrder?.store?.storeAddress?.address1}},
+                        {{orderData?.purchaseOrder?.store?.storeAddress?.city}},
+                        {{orderData?.purchaseOrder?.store?.storeAddress?.postcode}}</div>
+                    <!-- <div>hughes.brian@company.com</div> -->
+                    <div>Phone: {{orderData?.purchaseOrder?.store?.storeAddress?.phoneNumber || 'N/A'}}</div>
+                </div>
+
+                <div>
+                    <div class="text-xl font-medium mt-4">Shipping Info</div>
+                    <div class="grid grid-cols-4">
+                        <span>SKU: {{orderData?.purchaseOrder?.deliveryTerm.sku}}</span>
+                        <span>Unit Price: {{(orderData?.purchaseOrder?.deliveryTerm.unitPrice / 100) | number :
+                            '1.2-2'}}</span>
+                        <span>Currency: {{orderData?.purchaseOrder?.deliveryTerm.currency}}</span>
+                        <span>Description: {{orderData?.purchaseOrder?.deliveryTerm.description}}</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-x-1 mt-12">
+                    <!-- Columns -->
+                    <div class="font-medium text-md text-secondary">SKU</div>
+                    <div class="col-span-6 font-medium text-md text-secondary">PRODUCT</div>
+                    <div class="col-span-2 font-medium text-md text-right text-secondary">RATE</div>
+                    <div class="font-medium text-md text-right text-secondary">QTY</div>
+                    <div class="col-span-2 font-medium text-md text-right text-secondary">TOTAL</div>
+                </div>
+                <div *ngFor="let item of orderData?.products" class="grid grid-cols-12 gap-x-1">
+                    <!-- Divider -->
+                    <div class="col-span-12 my-4 border-b"></div>
+
+                    <!-- Item -->
+                    <div class="self-center text-lg font-medium">{{item?.productPrice?.product?.sku}}</div>
+                    <div class="col-span-6 text-lg font-medium">{{item?.productPrice?.product?.product.name}}</div>
+                    <div class="col-span-2  self-center text-right">{{(item?.productPrice?.unitPrice / 100) | currency : orderData?.pricing?.currency}}
+                    </div>
+                    <div class="self-center text-right">{{item.quantity}}</div>
+                    <div class="col-span-2 self-center text-right">{{(item?.productPrice?.unitPrice / 100) * item?.quantity | currency: orderData?.pricing?.currency}}
+                    </div>
+                </div>
+                <div class="grid grid-cols-12 gap-x-1">
+                    <!-- Spacer -->
+                    <div class="col-span-12 mt-16"></div>
+
+                    <!-- Subtotal -->
+                    <div class="col-span-10 self-center font-medium tracking-tight text-secondary">SUBTOTAL</div>
+                    <div class="col-span-2 text-right text-lg">{{(orderData?.pricing?.productUnitPriceTotal / 100) | currency : orderData?.pricing?.currency}}</div>
+
+                    <!-- Divider -->
+                    <div class="col-span-12 my-3 border-b"></div>
+
+                    <!-- Tax -->
+                    <div class="col-span-10 self-center font-medium tracking-tight text-secondary">TAX</div>
+                    <div class="col-span-2 text-right text-lg">{{(orderData?.pricing?.salesTaxTotal / 100) | currency : orderData?.pricing?.currency}}</div>
+
+                    <!-- Divider -->
+                    <div class="col-span-12 my-3 border-b"></div>
+
+                    <!-- Discount -->
+                    <div class="col-span-10 self-center font-medium tracking-tight text-secondary">SHIPPING</div>
+                    <div class="col-span-2 text-right text-lg">{{(orderData?.pricing?.shippingCost / 100) | currency : orderData?.pricing?.currency}}</div>
+
+                    <!-- Divider -->
+                    <div class="col-span-12 my-3 border-b"></div>
+
+                    <!-- Total -->
+                    <div class="col-span-10 self-center text-2xl font-medium tracking-tight text-secondary">TOTAL</div>
+                    <div class="col-span-2 text-right text-2xl font-medium">{{(orderData?.pricing?.total / 100) | currency : orderData?.pricing?.currency}}</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #modal let-modal>
+    <div class="modal-header">
+        <h2 class="mat-dialog-title">
+            Basket Details
+        </h2>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <form (ngSubmit)="onSubmit()" class="mt-3" [formGroup]="form">
+            <div class="fuse-mat-no-subscript w-full" [ngClass]="{'disabled':isDisable}">
+                <search-product [label]="'Product'" [onlyLive]="'true'" (onSelect)="onProductChange($event)" formControlName="product"></search-product>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" *ngIf="productInfo(form.controls.product)">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Currency*</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'currency'" [placeholder]="'currency'" [spellcheck]="false">
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full quantity-field">
+                    <mat-label>Quantity*</mat-label>
+                    <mat-icon (click)="plusQuantity()" matSuffix class="hidden sm:flex icon-size-5"
+                        [svgIcon]="'heroicons_solid:plus'">
+                    </mat-icon>
+                    <mat-icon (click)="minusQuantity()" matPrefix class="hidden sm:flex icon-size-5"
+                        [svgIcon]="'heroicons_solid:minus'">
+                    </mat-icon>
+                    <input class="text-center" type="number" readonly matInput [formControlName]="'quantity'"
+                        [placeholder]="'quantity'" [spellcheck]="false">
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Unit Price*</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'unitPrice'" [placeholder]="'unitPrice'" [spellcheck]="false">
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Total*</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'total'" [placeholder]="'total'" [spellcheck]="false">
+                </mat-form-field>
+            </div>
+            <div class="text-right">
+                <button class="ml-auto mr-3" mat-button [matTooltip]="'Cancel'" type="button" (click)="closeModal()">
+                    Cancel
+                </button>
+                <button button mat-flat-button [color]="'primary'" class="btn btn-primary"
+                    type="submit">{{isDisable ? 'Update' : 'Save'}}</button>
+            </div>
+        </form>
+    </mat-dialog-content>
+</ng-template>
+
+<ng-template #couponModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">
+            Coupon Details
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <form (ngSubmit)="addCoupon()" [formGroup]="couponform">
+            <mat-form-field class="fuse-mat-no-subscript w-full">
+                <mat-label>Select Coupon*</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                    [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                <mat-select matInput [formControlName]="'coupon'">
+                    <mat-option [value]="coupon" *ngFor="let coupon of couponsList">{{coupon?.name}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div class="grid grid-cols-2 gap-4 mt-3" *ngIf="couponform.controls.coupon.value">
+            <mat-form-field class="fuse-mat-no-subscript w-full">
+                <mat-label>Credit</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                </mat-icon>
+                <input matInput [value]="couponform.controls.coupon.value?.credit">
+            </mat-form-field>
+
+            <mat-form-field class="fuse-mat-no-subscript w-full">
+                <mat-label>Valid From</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                </mat-icon>
+                <input matInput [value]="couponform.controls.coupon.value?.validFrom | date">
+            </mat-form-field>
+            </div>
+            <div class="text-right">
+                <button class="ml-auto mr-3" mat-button [matTooltip]="'Cancel'" type="button" (click)="closeModal()">
+                    Cancel
+                </button>
+                <button button mat-flat-button [color]="'primary'" class="mt-7 btn btn-primary"
+                    type="submit">Apply</button>
+            </div>
+        </form>
+    </mat-dialog-content>
+</ng-template>
+
+<ng-template #deliveryModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">
+            Address Details
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <form (ngSubmit)="addShipingAddress()" [formGroup]="deliveryform">
+            <app-address-drop-down [customerId]="customerId" (onSelect)="gotSelectedData($event)" [address]="basketInfo?.deliveryAddress"></app-address-drop-down>
+            <!-- <search-address  [customerId]="customerId" [isCustomerAddressSearch]="true" [input]="deliveryform.get('address')" (onSelect)="gotSelectedData($event)"></search-address> -->
+            <!-- <app-save-address *ngIf="(isLoadingObs | async) !== true" [address]="deliveryform.get('address')"></app-save-address> -->
+            <button button mat-flat-button [color]="'primary'" class="mt-7 btn btn-primary" type="submit">Save</button>
+        </form>
+    </mat-dialog-content>
+</ng-template>
+
+<ng-template #billingAddressModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">
+            Address Details
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <form (ngSubmit)="addBillingAddress()" [formGroup]="billingForm">
+            <app-address-drop-down [customerId]="customerId" (onSelect)="gotSelectedData($event)" [address]="basketInfo?.billingAddress"></app-address-drop-down>
+            <button button mat-flat-button [color]="'primary'" class="mt-7 btn btn-primary" type="submit">Save</button>
+        </form>
+    </mat-dialog-content>
+</ng-template>

@@ -1,0 +1,668 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="print:hidden flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/customers']" class="whitespace-nowrap text-primary-500">Customers</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Order Details</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-1xl mb-3 md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    Order Details
+                </h2>
+                <div class="align-center flex justify-between flex-column sm:flex-row">
+
+                    <div *ngIf="!orderGenerated">
+                        <button (click)="openModal(cancel)" mat-flat-button [color]="'warn'">
+                            Cancel
+                        </button>
+                        <!-- <button class="mx-2" (click)="openModal(refund)" mat-flat-button [color]="'warn'">
+                            Refund
+                        </button> -->
+                        <button class="ml-2" (click)="invoice()" mat-flat-button [color]="'primary'">
+                            View Reciept
+                        </button>
+                        <button class="ml-2 mt-1 sm:mt-0" (click)="viewPublicReceipt()" mat-flat-button [color]="'primary'">
+                            View Public Reciept
+                        </button>
+                    </div>
+                    <div *ngIf="orderGenerated">
+                        <button class="mr-2" [routerLink]="['/admin/customers/', customerId, 'orders']" mat-flat-button
+                            [color]="'accent'">
+                            Back
+                        </button>
+                        <button (click)="print()" mat-flat-button [color]="'primary'">
+                            Print
+                        </button>
+                    </div>
+
+                    <div class="sm:align-items-center d-flex flex-column mt-3 sm:flex-row">
+                        <mat-form-field class="fuse-mat-no-subscript w-full" style="min-width: 240px;">
+                            <!-- <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                                [svgIcon]="'heroicons_solid:office-building'"></mat-icon> -->
+                            <mat-select matInput [(ngModel)]="activeStatus">
+                                <mat-option value="">-- Select Status --</mat-option>
+                                <mat-option [value]="status"
+                                    *ngFor="let status of statuses">{{removeUnderscore(status?.systemName)}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div class="ml-2 mt-1">
+                            <button mat-flat-button [color]="'primary'" (click)="changeStatus()">
+                                Change Status
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last" mat-icon-button (click)="toggleDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="flex-auto p-6 sm:p-10">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <div class="flex flex-column sm:flex-row" *ngIf="!orderGenerated && order">
+            <div class="flex-auto mr-0 sm:mr-7">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full mb-4">
+                    <div class="py-6 px-3 rounded-md shadow bg-card">
+                        <div class="font-medium">Order Id</div>
+                        <span class="mt-1 whitespace-normal text-secondary">{{order.id || 'N/A'}}</span>
+                    </div>
+                    <div class="py-6 px-3 rounded-md shadow bg-card">
+                        <div class="font-medium">Ordered At</div>
+                        <span class="mt-1 whitespace-normal text-secondary">{{order.orderedAt | date}}</span>
+                    </div>
+                    <div class="py-6 px-3 rounded-md shadow bg-card">
+                        <div class="font-medium">Status</div>
+                        <span *ngIf="order.status?.name == 'ORDER_PROCESSING'"
+                            class="py-0.5 px-3 rounded-full text-sm font-semibold text-pink-800 bg-pink-100 dark:text-pink-50 dark:bg-pink-500">Processing</span>
+                        <span *ngIf="order.status?.name == 'ORDER_CANCELLED'"
+                            class="py-0.5 px-3 rounded-full text-sm font-semibold text-pink-800 bg-pink-100 dark:text-pink-50 dark:bg-pink-500">Canceled</span>
+                        <span *ngIf="order.status?.name == 'ORDER_COMPLETED'"
+                            class="py-0.5 px-3 rounded-full text-sm font-semibold text-green-800 bg-green-100 dark:text-green-50 dark:bg-green-500">Completed</span>
+                        <span *ngIf="order.status?.name == 'ORDER_DELIVERED'"
+                            class="py-0.5 px-3 rounded-full text-sm font-semibold text-green-800 bg-green-100 dark:text-green-50 dark:bg-green-500">Delivered</span>
+                        <span *ngIf="order.status?.name == 'ORDER_REFUNDED'"
+                            class="py-0.5 px-3 rounded-full text-sm font-semibold text-pink-800 bg-pink-100 dark:text-pink-50 dark:bg-pink-500">Refunded</span>
+
+                        <span
+                            *ngIf="order.status?.name != 'ORDER_REFUNDED' && order.status?.name != 'ORDER_DELIVERED' && order.status?.name != 'ORDER_COMPLETED' && order.status?.name != 'ORDER_CANCELLED' && order.status?.name != 'ORDER_PROCESSING'"
+                            class="py-0.5 px-3 rounded-full text-sm font-semibold text-pink-800 bg-pink-100 dark:text-pink-50 dark:bg-pink-500">{{
+                            removeUnderScore (order.status?.name) | titlecase}}</span>
+
+                    </div>
+
+                    <div class="py-6 px-3 rounded-md shadow bg-card">
+                        <div class="font-medium flex">
+                            <div class="external">External Reference Number</div>
+                             <mat-icon (click)="addDelivery(externalReferenceNumber)" style="height: 18px;
+                             width: 18px;
+                             cursor: pointer;
+                             min-width: 18px;
+                             margin-left: 4px;" [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                        </div>
+                        <span class="mt-1 whitespace-normal text-secondary">{{order.externalReference || 'N/A'}}</span>
+                    </div>
+
+                </div>
+                <div class="bg-card shadow rounded-2xl overflow-auto p-5 mt-4">
+                    <table class="w-full bg-white" mat-table [dataSource]="dataSource">
+                        <ng-container matColumnDef="image">
+                            <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                Image
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                <div
+                                    class="product-thumbnail-sm m-2 rounded p-2 border flex items-center justify-center overflow-hidden">
+
+                                    <img class="w-full h-full"
+                                        [src]="element.product.images && element.product.images.length  && element.product.images[0] ? element.product.images[0].publicUrl: ''"
+                                        onError="this.src='assets/images/no-image.jpg'" />
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="id">
+                            <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                Product
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                <a class="text-primary" [routerLink]="['/admin/products/edit/', element.product.id]">
+                                    {{element.product?.name}}</a>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="name">
+                            <th mat-header-cell *matHeaderCellDef>
+                                QTY
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{element.quantity}}
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="created">
+                            <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                Category
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                <a class="text-primary"
+                                    [routerLink]="['/admin/productcategories/', element.product?.category?.id]">
+                                    {{element.product?.categoryName}}</a>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="term">
+                            <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                                Total
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{(element.price?.unitPrice / 100) | currency : order.orderCharge?.currency}}
+                            </td>
+                        </ng-container>
+
+                        <tr class="bg-white shadow" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true">
+                        </tr>
+                        <tr class="order-row h-16" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                    <div class="mt-5 text-right">
+                        <div>
+                            <span class="font-medium">Total</span>
+                            <span
+                                class="whitespace-normal text-secondary w-24 inline-block">{{(order.orderCharge?.productCharge
+                                / 100) | currency : order.orderCharge?.currency}}</span>
+                        </div>
+                        <div class="mt-2">
+                            <span class="font-medium">Shipping</span>
+                            <span
+                                class="whitespace-normal text-secondary w-24 inline-block">{{(order.orderCharge?.deliveryCharge
+                                / 100) | currency : order.orderCharge?.currency}}</span>
+                        </div>
+                        <div class="mt-2" *ngIf="order.orderCharge?.taxCharge">
+                            <span class="font-medium">Tax</span>
+                            <span
+                                class="whitespace-normal text-secondary w-24 inline-block">{{(order.orderCharge?.totalTaxCharge
+                                / 100) | currency : order.orderCharge?.currency}}</span>
+                        </div>
+
+                        <div class="mt-2">
+                            <span class="font-medium">Deposit</span>
+                            <span
+                                class="whitespace-normal text-secondary w-24 inline-block">{{(order.orderCharge?.deposit
+                                / 100) | currency : order.orderCharge?.currency}}</span>
+                        </div>
+                        <div class="mt-2">
+                            <span class="font-medium">Other</span>
+                            <span
+                                class="whitespace-normal text-secondary w-24 inline-block">{{((order.orderCharge?.productSaleCharge
+                                / 100 + order.orderCharge?.serviceCharge /
+                                100 + order.orderCharge?.smallOrderCharge / 100) || '0') | currency :
+                                order.orderCharge?.currency}}</span>
+                        </div>
+                        <div class="mt-2">
+                            <span class="font-medium">Grand Total</span>
+                            <span
+                                class="whitespace-normal text-secondary w-24 inline-block">{{(order.orderCharge?.totalCharge
+                                / 100) | currency : order.orderCharge?.currency}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-none sm:w-68 mt-3">
+                <div class="py-6 px-3 rounded-2xl sm:rounded-md shadow bg-card">
+                    <div class="font-medium">Store</div>
+                    <span class="mt-1 whitespace-normal text-secondary">{{order.store?.name || 'N/A'}}</span>
+                    <div class="font-medium mt-5">Shipping Address <i class="align-middle cursor-pointer"
+                            (click)="addDelivery(deliveryModal)">
+                            <mat-icon [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                        </i></div>
+                        <span class="mt-1 whitespace-normal cursor-pointer text-primary-500" (click)="goToAllAddresses()">{{order?.deliveryAddress?.address1|| 'N/A'}}</span>
+                    <div class="font-medium mt-5">Billing Address <i class="align-middle cursor-pointer"
+                            (click)="addDelivery(billingAddressModal)">
+                            <mat-icon [svgIcon]="'heroicons_solid:pencil'"></mat-icon>
+                        </i></div>
+                        <span class="mt-1 whitespace-normal cursor-pointer text-primary-500" (click)="goToAllAddresses()">{{order?.billingAddress?.address1|| 'N/A'}}</span>
+                </div>
+                <div class="py-6 px-3 rounded-2xl sm:rounded-md shadow bg-card mt-5">
+                    <div class="font-medium">Activity</div>
+                    <ol>
+                        <!-- <li class="relative flex py-7" *ngIf="order.completedAt">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600">
+                            </div>
+                            <div class="relative flex flex-auto">
+                                <div
+                                    class="flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                    <mat-icon class="icon-size-5 text-white" [svgIcon]="'heroicons_solid:star'">
+                                    </mat-icon>
+                                </div>
+                                <div class="flex flex-col flex-auto items-start">
+                                    <div>Completed</div>
+                                    <div
+                                        class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 sm:space-x-2 text-md leading-5">
+                                        <div class="text-secondary">
+                                            {{order.completedAt | date: 'MMM d, y, h:mm a'}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="relative flex py-7" *ngIf="order.dispatchedAt">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600">
+                            </div>
+                            <div class="relative flex flex-auto">
+                                <div
+                                    class="flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                    <mat-icon class="icon-size-5 text-white" [svgIcon]="'heroicons_solid:star'">
+                                    </mat-icon>
+                                </div>
+                                <div class="flex flex-col flex-auto items-start">
+                                    <div>Supplier Sent</div>
+                                    <div
+                                        class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 sm:space-x-2 text-md leading-5">
+                                        <div class="text-secondary">
+                                            {{order.dispatchedAt | date: 'MMM d, y, h:mm a'}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="relative flex py-7" *ngIf="order.deliveredAt">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600">
+                            </div>
+                            <div class="relative flex flex-auto">
+                                <div
+                                    class="flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                    <mat-icon class="icon-size-5 text-white" [svgIcon]="'heroicons_solid:star'">
+                                    </mat-icon>
+                                </div>
+                                <div class="flex flex-col flex-auto items-start">
+                                    <div>Received</div>
+                                    <div
+                                        class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 sm:space-x-2 text-md leading-5">
+                                        <div class="text-secondary">
+                                            {{order.deliveredAt | date: 'MMM d, y, h:mm a'}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="relative flex py-7" *ngIf="order.paidAt">
+                            <div class="absolute top-7 left-5 w-0.5 h-full -ml-px bg-gray-300 dark:bg-gray-600">
+                            </div>
+                            <div class="relative flex flex-auto">
+                                <div
+                                    class="flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                    <mat-icon class="icon-size-5 text-white" [svgIcon]="'heroicons_solid:star'">
+                                    </mat-icon>
+                                </div>
+                                <div class="flex flex-col flex-auto items-start">
+                                    <div>Paid</div>
+                                    <div
+                                        class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 sm:space-x-2 text-md leading-5">
+                                        <div class="text-secondary">
+                                            {{order.paidAt | date: 'MMM d, y, h:mm a'}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li> -->
+                        <li class="relative flex py-7" *ngIf="order.createdAt">
+                            <div class="relative flex flex-auto">
+                                <div
+                                    class="flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                    <mat-icon class="icon-size-5 text-white" [svgIcon]="'heroicons_solid:star'">
+                                    </mat-icon>
+                                </div>
+                                <div class="flex flex-col flex-auto items-start">
+                                    <div>Created</div>
+                                    <div
+                                        class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 sm:space-x-2 text-md leading-5">
+                                        <div class="text-secondary">
+                                            {{order.createdAt | date: 'MMM d, y, h:mm a'}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="relative flex py-7" *ngFor="let status of orderStatuses">
+                            <div class="relative flex flex-auto">
+                                <div
+                                    class="flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                    <mat-icon class="icon-size-5 text-white" *ngIf="status.name === 'ORDER_PROCESSING'">data_usage</mat-icon>
+                                    <mat-icon class="icon-size-5 text-white" *ngIf="status.name === 'ORDER_PAYMENT_COMPLETE'">check_circle</mat-icon>
+                                    <mat-icon class="icon-size-5 text-white" *ngIf="status.name === 'STORE_ACCEPTED'">  store_mall_directory</mat-icon>
+                                    <mat-icon class="icon-size-5 text-white" *ngIf="status.name === 'FINANCE_APPLICATION_SUBMITTED'">inventory</mat-icon>
+                                    <mat-icon class="icon-size-5 text-white" *ngIf="status.name === 'FINANCE_APPLICATION_STARTED'">start</mat-icon>
+                                    <mat-icon class="icon-size-5 text-white" *ngIf="status.name === 'LENDER_PRODUCT_SELECTED'">checklist</mat-icon>
+                                    <!-- <mat-icon class="icon-size-5 text-white" *ngIf="status.name !== 'ORDER_PROCESSING' && status.name !== 'ORDER_PAYMENT_COMPLETE' && status.name !== 'STORE_ACCEPTED' ">data_usage</mat-icon> -->
+
+                                </div>
+                                <div class="flex flex-col flex-auto items-start">
+                                    <div>{{status.name}}</div>
+                                    <div
+                                        class="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-1 sm:space-x-2 text-md leading-5">
+                                        <div class="text-secondary">
+                                            {{status.createdAt | date: 'MMM d, y, h:mm a'}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="mt-5" *ngIf="!orderGenerated && order?.routeOrder?.courier?.lastKnownLocation">
+            <h3 class="text-2xl mb-2 font-extrabold">Last Location</h3>
+            <div style="height: 240px;" class="border rounded p-2 shadow bg-white">
+                <!-- <agm-map class="h-full" [latitude]="order.routeOrder.courier.lastKnownLocation.latitude"
+                    [longitude]="order.routeOrder.courier.lastKnownLocation.longitude" [zoom]="12">
+                    <agm-marker [latitude]="order.routeOrder.courier.lastKnownLocation.latitude"
+                        [longitude]="order.routeOrder.courier.lastKnownLocation.longitude"></agm-marker>
+                </agm-map> -->
+            </div>
+        </div>
+        <div *ngIf="orderGenerated && orderData">
+            <!-- Invoice -->
+            <div
+                class="p-6 rounded-2xl shadow bg-card print:w-auto print:rounded-none print:shadow-none print:bg-transparent">
+
+                <div class="flex flex-column sm:flex-row items-start justify-between">
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                        <div class="text-3xl tracking-tight text-secondary">INVOICE</div>
+                        <div class="text-3xl">{{orderData.reference}}</div>
+                        <div class="font-medium tracking-tight text-secondary">INVOICE DATE</div>
+                        <div class="font-medium">{{orderData.createdAt | date}}</div>
+                        <div class="font-medium tracking-tight text-secondary">TOTAL DUE</div>
+                        <div class="font-medium">{{(orderData.orderCharge?.totalCharge / 100) | currency :
+                            orderData.orderCharge?.currency}}</div>
+                    </div>
+                    <div class="grid auto-cols-max grid-flow-col gap-x-8 -mr-6 py-6 px-8 rounded-l-2xl bg-accent dark">
+                        <div class="place-self-center w-24">
+                            <img class="w-24" [src]="businessAccount?.publicImageUrl"
+                                onError="this.src='assets/images/no-image.jpg'" />
+                        </div>
+                        <div class="pl-10 border-l text-md">
+                            <div class="font-medium">{{businessAccount?.legalName}}</div>
+                            <div *ngIf="orderData?.store">
+                                {{businessAccount?.registeredAddress?.address1}}
+                                <br>
+                                {{businessAccount?.registeredAddress?.city}},
+                                {{businessAccount?.registeredAddress?.postcode}}
+                                <div>Phone: {{businessAccount?.registeredAddress?.phoneNumber || 'N/A'}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-md">
+                    <div class="text-xl font-medium">Delivery Address</div>
+                    <div>{{orderData?.deliveryAddress?.address1}},
+                        {{orderData?.deliveryAddress?.city}},
+                        {{orderData?.deliveryAddress?.postcode}}</div>
+                    <div>Phone: {{orderData?.deliveryAddress?.phoneNumber || 'N/A'}}</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-x-1 mt-12">
+                    <!-- Columns -->
+                    <div class="font-medium text-md text-secondary">ID</div>
+                    <div class="col-span-8 font-medium text-md text-secondary">PRODUCT</div>
+                    <div class="font-medium text-md text-right text-secondary">QTY</div>
+                    <div class="col-span-2 font-medium text-md text-right text-secondary">TOTAL</div>
+                </div>
+                <div *ngFor="let item of orderData.orderProducts" class="grid grid-cols-12 gap-x-1">
+                    <!-- Divider -->
+                    <div class="col-span-12 my-4 border-b"></div>
+
+                    <!-- Item -->
+                    <div class="self-center text-lg font-medium">{{item.id}}</div>
+                    <div class="col-span-8 text-lg font-medium">{{item.product.name}}</div>
+                    <div class="self-center text-right">{{item.quantity}}</div>
+                    <div class="col-span-2 self-center text-right">{{(item.price.unitPrice / 100) * item.quantity |
+                        currency: orderData.orderCharge?.currency}}
+                    </div>
+                </div>
+                <div class="grid grid-cols-12 gap-x-1">
+                    <!-- Spacer -->
+                    <div class="col-span-12 mt-16"></div>
+
+                    <!-- Subtotal -->
+                    <div class="col-span-10 self-center font-medium tracking-tight text-secondary">SUBTOTAL</div>
+                    <div class="col-span-2 text-right text-lg">{{(orderData.orderCharge?.productCharge / 100) | currency
+                        : orderData.orderCharge?.currency}}</div>
+
+                    <!-- Divider -->
+                    <div class="col-span-12 my-3 border-b"></div>
+
+                    <!-- Tax -->
+                    <div class="col-span-10 self-center font-medium tracking-tight text-secondary">TAX</div>
+                    <div class="col-span-2 text-right text-lg">{{(orderData.orderCharge?.totalTaxCharge / 100) |
+                        currency : orderData.orderCharge?.currency}}</div>
+                    
+                      <!-- Divider -->
+                    <div class="col-span-12 my-3 border-b"></div>
+                    <!-- deposit -->
+                    <div class="col-span-10 self-center font-medium tracking-tight text-secondary">DEPOSIT</div>
+                    <div class="col-span-2 text-right text-lg">{{(orderData.orderCharge?.deposit / 100) |
+                        currency : orderData.orderCharge?.currency}}</div>
+
+                    <!-- Divider -->
+                    <div class="col-span-12 my-3 border-b"></div>
+
+                    <!-- Discount -->
+                    <div class="col-span-10 self-center font-medium tracking-tight text-secondary">SHIPPING</div>
+                    <div class="col-span-2 text-right text-lg">{{(orderData.orderCharge?.deliveryCharge / 100) |
+                        currency : orderData.orderCharge?.currency}}</div>
+
+                    <!-- Divider -->
+                    <div class="col-span-12 my-3 border-b"></div>
+
+                    <div class="col-span-10 self-center font-medium tracking-tight text-secondary">OTHER</div>
+                    <div class="col-span-2 text-right text-lg">{{((order.orderCharge?.productSaleCharge / 100 +
+                        order.orderCharge?.serviceCharge / 100 +
+                        order.orderCharge?.smallOrderCharge / 100) || '0.00') | currency : order.orderCharge?.currency}}
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="col-span-12 my-3 border-b"></div>
+
+                    <!-- Total -->
+                    <div class="col-span-10 self-center text-2xl font-medium tracking-tight text-secondary">TOTAL</div>
+                    <div class="col-span-2 text-right text-2xl font-medium">{{(orderData.orderCharge?.totalCharge / 100)
+                        | currency : orderData.orderCharge?.currency}}</div>
+                </div>
+
+                <div class="mt-6" *ngIf="orderData?.store">
+                    <div class="font-medium">
+                        <div class="text-xl font-medium">{{businessAccount?.legalName}}</div>
+                        Company number: {{businessAccount?.companyNumber}} <br>
+                        Vat number: {{businessAccount?.taxNumber}} <br>
+                        Address: {{businessAccount?.registeredAddress?.address1 +', '+
+                        businessAccount?.registeredAddress?.city +', '+ businessAccount?.registeredAddress?.postcode }}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #cancel let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">
+            Cancel Order
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <fuse-alert *ngIf="cancelform.invalid && formSubmitted" class="my-3" [appearance]="'outline'"
+            [type]="'warning'">
+            Please fill in all the required fields.
+        </fuse-alert>
+        <form (ngSubmit)="cancelOrder()" [formGroup]="cancelform">
+            <div class="grid grid-cols-2 gap-4 mb-5">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Reason*</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                    </mat-icon>
+                    <mat-select matInput formControlName="reason">
+                        <mat-option *ngFor="let option of reasons" [value]="option">{{option}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-checkbox class="example-margin mt-7" [formControlName]="'refund'">Refund
+                </mat-checkbox>
+            </div>
+            <mat-form-field class="fuse-mat-no-subscript w-full">
+                <mat-label>Notes</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                </mat-icon>
+                <textarea matInput [formControlName]="'notes'" [placeholder]="'notes'" [spellcheck]="false"></textarea>
+            </mat-form-field>
+            <button button mat-flat-button [color]="'primary'" class="mt-7 btn btn-primary"
+                type="submit">Submit</button>
+        </form>
+    </mat-dialog-content>
+</ng-template>
+
+<ng-template #refund let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">
+            Refund Order
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <fuse-alert *ngIf="refundform.invalid && formSubmitted" class="my-3" [appearance]="'outline'"
+            [type]="'warning'">
+            Please fill in all the required fields.
+        </fuse-alert>
+        <form (ngSubmit)="refundOrder()" [formGroup]="refundform">
+            <div class="grid grid-cols-2 gap-4 mb-5">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Reason*</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                    </mat-icon>
+                    <mat-select matInput formControlName="reason">
+                        <mat-option *ngFor="let option of reasons" [value]="option">{{option}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Quantity*</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'quantity'" [placeholder]="'quantity'" [spellcheck]="false">
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Refunded</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'refunded'" [placeholder]="'refunded'" [spellcheck]="false">
+                </mat-form-field>
+            </div>
+            <mat-form-field class="fuse-mat-no-subscript w-full">
+                <mat-label>Notes</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                </mat-icon>
+                <textarea matInput [formControlName]="'notes'" [placeholder]="'notes'" [spellcheck]="false"></textarea>
+            </mat-form-field>
+            <button button mat-flat-button [color]="'primary'" class="mt-7 btn btn-primary"
+                type="submit">Submit</button>
+        </form>
+    </mat-dialog-content>
+</ng-template>
+
+<!-- <ng-template #deliveryModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">
+            Address Details
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <form (ngSubmit)="addAddress()" [formGroup]="deliveryform">
+            <app-save-address *ngIf="(isLoadingObs | async) !== true"
+                [address]="deliveryform.get('address')"></app-save-address>
+            <button button mat-flat-button [color]="'primary'" class="mt-7 btn btn-primary" type="submit">Save</button>
+        </form>
+    </mat-dialog-content>
+</ng-template> -->
+
+
+<!-- modals of delivery(shipping) and billing address -->
+<ng-template #deliveryModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">
+            Address Details
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <form (ngSubmit)="addShipingAddress()" [formGroup]="deliveryform">
+            <app-address-drop-down [customerId]="customerId" (onSelect)="gotSelectedData($event)" [address]="order.deliveryAddress"></app-address-drop-down>
+            <button button mat-flat-button [color]="'primary'" class="mt-7 btn btn-primary" type="submit">Save</button>
+        </form>
+    </mat-dialog-content>
+</ng-template>
+
+<ng-template #billingAddressModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">
+            Address Details
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <mat-dialog-content>
+        <form (ngSubmit)="addBillingAddress()" [formGroup]="billingForm">
+            <app-address-drop-down [customerId]="customerId" (onSelect)="gotSelectedData($event)" [address]="order?.billingAddress"></app-address-drop-down>
+            <button button mat-flat-button [color]="'primary'" class="mt-7 btn btn-primary" type="submit">Save</button>
+        </form>
+    </mat-dialog-content>
+</ng-template>
+
+
+<ng-template #externalReferenceNumber let-modal>
+    <div class="modal-header">
+        <!-- <h4 class="mat-dialog-title">
+            External Reference Number
+        </h4> -->
+        <h2 class="mat-dialog-title text-2xl">External Reference Number</h2>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <mat-dialog-content>
+         <form (submit)="addReferenceNumber()">
+                <mat-form-field class="mt-4 fuse-mat-no-subscript w-full">
+                    <input [(ngModel)]="externalReference" matInput [placeholder]="'External Reference Number'" [ngModelOptions]="{standalone: true}">
+                  </mat-form-field>
+                  <div class="text-right">
+                      <button button mat-flat-button [color]="'primary'" class="mt-7 btn btn-primary"
+                        type="submit" >Add</button>
+                  </div>
+            </form>
+    </mat-dialog-content>
+</ng-template>

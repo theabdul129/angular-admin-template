@@ -1,0 +1,14 @@
+<div class="modal-header">
+    <h4 class="mat-dialog-title">
+        Address Details
+    </h4>
+    <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<mat-dialog-content>
+    <form (ngSubmit)="onSubmit()" [formGroup]="form">
+        <app-save-address *ngIf="(isLoadingObs | async) !== true" [address]="form.get('address')"></app-save-address>
+        <button button mat-flat-button [color]="'primary'" class="mt-7 btn btn-primary" type="submit">Save</button>
+    </form>
+</mat-dialog-content>

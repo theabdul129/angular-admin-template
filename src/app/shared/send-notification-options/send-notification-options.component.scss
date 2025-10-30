@@ -1,0 +1,36 @@
+._image {
+    margin: 12px 17px;
+    img {
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+    .emial {
+        width: 89%;
+        height: 89%;
+        margin-top: 3px;
+    }
+}
+
+._button{
+    background-color: #4f46e5;
+    color: white;
+    padding: 8px 24px;
+    border-radius: 7px;
+}
+
+.sms{
+    width: 40px; 
+    height: 50px;
+}
+
+.whatsapp{
+    width: 35px;
+    height: 45px;
+}
+
+.activeIcon{
+    width: 65px;
+    height: 65px;
+}

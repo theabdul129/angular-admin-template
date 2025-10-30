@@ -1,0 +1,51 @@
+<div class="modal-content cnt-dashboard border-0">
+
+    <div class="text-right">
+        <button (click)="onDismiss()"><mat-icon class="material-symbols-outlined">close</mat-icon></button>
+    </div>
+
+    <div class="modal-body bg-gris-1 p-5 text-center">
+        <h4 class="text-lg fs-4">
+            Choose an appropriate method to send Notification
+        </h4>
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="d-flex justify-content-center _image " [ngClass]="selectedOPtion=='sms'? 'activeIcon':'sms'" (click)="selectedOPtion='sms';formInit()">
+                <img
+                    class="mb-4 emial"
+                    src="./../../../assets/images/SMS_icon_circle.png"
+                />
+            </div>
+            <div class="d-flex justify-content-center _image" [ngClass]="selectedOPtion=='whatsapp'? 'activeIcon':'whatsapp'" (click)="selectedOPtion='whatsapp';formInit()">
+                <img
+                    class="mb-4"
+                    src="./../../../assets/images/call_icon-removebg-preview.png"
+                />
+            </div>
+            <div class="d-flex justify-content-center _image" [ngClass]="selectedOPtion=='email'? 'activeIcon':'sms'" (click)="selectedOPtion='email';formInit()">
+                <img
+                    role="buttom"
+                    class="mb-4 emial"
+                    src="./../../../assets/images/email_icon.png"
+                />
+            </div>
+        </div>
+
+        <ng-container *ngIf="selectedOPtion=='sms'||selectedOPtion=='whatsapp'||selectedOPtion=='email'">
+            <div class="email_section px-5 pt-5">
+                <form [formGroup]="emailForm" (submit)="selectedAction()" >
+                    <mat-form-field *ngIf="selectedOPtion=='email'" class="example-full-width w-full" appearance="fill">
+                        <mat-label >Subject</mat-label>
+                        <input #input type="text" placeholder="Subject" formControlName="subject" aria-label="Number" matInput>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" id="description" floatLabel="always" class="example-full-width w-full">
+                        <textarea #input rows="5" matInput class="line-clamp-3 custom-placeholder" formControlName="body" placeholder="Description...." ame="description" ></textarea>
+                    </mat-form-field>
+                </form>
+            </div>
+        </ng-container>
+
+        <div class="text-right">
+            <button class="_button" [disabled]="!selectedOPtion" (click)="selectedAction()">Send</button>
+        </div>
+    </div>
+</div>

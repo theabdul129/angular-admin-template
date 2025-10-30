@@ -1,0 +1,132 @@
+<mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+<div *ngIf="orderData" class="p-6 rounded-2xl shadow bg-card print:w-auto print:rounded-none print:shadow-none print:bg-transparent" style="width: 80%;margin: 35px auto;">
+    <div class="flex items-start justify-between">
+        <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+            <div class="text-3xl tracking-tight text-secondary">INVOICE</div>
+            <div class="text-3xl">{{orderData.reference}}</div>
+            <div class="font-medium tracking-tight text-secondary">INVOICE DATE</div>
+            <div class="font-medium">{{orderData.createdAt | date}}</div>
+            <div class="font-medium tracking-tight text-secondary">EXTERNAL REFERENCE#</div>
+            <div class="font-medium">{{orderData.externalReference}}</div>
+            <div class="font-medium tracking-tight text-secondary">TOTAL DUE</div>
+            <div class="font-medium">{{(orderData.orderCharge?.totalCharge / 100) | currency :
+                orderData.orderCharge?.currency}}</div>
+        </div>
+        <div class="grid auto-cols-max grid-flow-col gap-x-8 -mr-6 py-6 px-8 rounded-l-2xl bg-accent dark">
+            <div class="place-self-center w-24">
+                <img class="w-24" [src]="businessAccount?.publicImageUrl"
+                    onError="this.src='assets/images/no-image.jpg'" />
+            </div>
+            <div class="pl-10 border-l text-md">
+                <div class="font-medium">{{businessAccount?.legalName}}</div>
+                <div *ngIf="orderData?.store">
+                    {{businessAccount?.registeredAddress?.address1}}
+                    <br>
+                    {{businessAccount?.registeredAddress?.city}},
+                    {{businessAccount?.registeredAddress?.postcode}}
+                    <div>Phone: {{businessAccount?.registeredAddress?.phoneNumber || 'N/A'}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-md">
+        <div class="text-xl font-medium">Delivery Address</div>
+        <div>{{orderData?.deliveryAddress?.address1}},
+            {{orderData?.deliveryAddress?.city}},
+            {{orderData?.deliveryAddress?.postcode}}</div>
+        <div>Phone: {{orderData?.deliveryAddress?.phoneNumber || 'N/A'}}</div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-x-1 mt-12">
+        <!-- Columns -->
+        <div class="font-medium text-md text-secondary">ID</div>
+        <div class="col-span-8 font-medium text-md text-secondary">PRODUCT</div>
+        <div class="font-medium text-md text-right text-secondary">QTY</div>
+        <div class="col-span-2 font-medium text-md text-right text-secondary">TOTAL</div>
+    </div>
+    <div *ngFor="let item of orderData.orderProducts" class="grid grid-cols-12 gap-x-1">
+        <!-- Divider -->
+        <div class="col-span-12 my-4 border-b"></div>
+
+        <!-- Item -->
+        <div class="self-center text-lg font-medium">{{item.id}}</div>
+        <div class="col-span-8 text-lg font-medium">{{item.product.name}}</div>
+        <div class="self-center text-right">{{item.quantity}}</div>
+        <div class="col-span-2 self-center text-right">{{(item.price.unitPrice / 100) * item.quantity |
+            currency: orderData.orderCharge?.currency}}
+        </div>
+    </div>
+    <div class="grid grid-cols-12 gap-x-1">
+        <!-- Spacer -->
+        <div class="col-span-12 mt-16"></div>
+
+        <!-- Subtotal -->
+        <div class="col-span-10 self-center font-medium tracking-tight text-secondary">SUBTOTAL</div>
+        <div class="col-span-2 text-right text-lg">{{(orderData.orderCharge?.productCharge / 100) | currency
+            : orderData.orderCharge?.currency}}</div>
+
+        <!-- Divider -->
+        <div class="col-span-12 my-3 border-b"></div>
+
+        <!-- Tax -->
+        <div class="col-span-10 self-center font-medium tracking-tight text-secondary">TAX</div>
+        <div class="col-span-2 text-right text-lg">{{(orderData.orderCharge?.totalTaxCharge / 100) |
+            currency : orderData.orderCharge?.currency}}</div>
+
+        <!-- Divider -->
+        <div class="col-span-12 my-3 border-b"></div>
+
+        <!-- Discount -->
+        <div class="col-span-10 self-center font-medium tracking-tight text-secondary">SHIPPING</div>
+        <div class="col-span-2 text-right text-lg">{{(orderData.orderCharge?.deliveryCharge / 100) |
+            currency : orderData.orderCharge?.currency}}</div>
+
+        <!-- Divider -->
+        <div class="col-span-12 my-3 border-b"></div>
+
+        <div class="col-span-10 self-center font-medium tracking-tight text-secondary">OTHER</div>
+        <div class="col-span-2 text-right text-lg">{{((orderData.orderCharge?.productSaleCharge / 100 +
+            orderData.orderCharge?.serviceCharge / 100 +
+            orderData.orderCharge?.smallOrderCharge / 100) || '0.00') | currency : orderData.orderCharge?.currency}}
+        </div>
+
+        <!-- Divider -->
+        <div class="col-span-12 my-3 border-b"></div>
+
+        <!-- Total -->
+        <div class="col-span-10 self-center text-2xl font-medium tracking-tight text-secondary">TOTAL</div>
+        <div class="col-span-2 text-right text-2xl font-medium">{{(orderData.orderCharge?.totalCharge / 100)
+            | currency : orderData.orderCharge?.currency}}</div>
+    </div>
+
+    <div class="mt-6" *ngIf="orderData?.store">
+        <div class="font-medium">
+            <div class="text-xl font-medium">{{businessAccount?.legalName}}</div>
+            Company number: {{businessAccount?.companyNumber}} <br>
+            Vat number: {{businessAccount?.taxNumber}} <br>
+            Address: {{businessAccount?.registeredAddress?.address1 +', '+
+            businessAccount?.registeredAddress?.city +', '+ businessAccount?.registeredAddress?.postcode }}
+        </div>
+    </div>
+
+    <div class="mt-6" *ngIf="orderData?.store">
+        <div class="font-medium">
+            <div class="text-xl font-medium">{{bankDetails?.accountName}}</div>
+            Account number: {{bankDetails?.accountNumber}} <br>
+            Sort Code: {{bankDetails?.sortCode}} <br>
+            Bank Name: {{bankDetails?.bankName}} <br>
+            Currency: {{bankDetails?.currency}} <br>
+        </div>
+    </div>
+
+</div>
+
+<div *ngIf="!orderData && (!isLoadingObs | async)" class="p-6 rounded-2xl shadow bg-card print:w-auto print:rounded-none print:shadow-none print:bg-transparent" style="width: 80%;margin: 35px auto;">
+    <div class="flex items-start justify-between">
+        <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+            <div class="text-3xl tracking-tight text-secondary text-center">Invoice Data not found</div>
+        </div>
+    </div>
+
+</div>

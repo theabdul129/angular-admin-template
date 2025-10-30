@@ -1,0 +1,9 @@
+.uploaaded_image {
+    height: 13rem;
+    width: 100%;
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}

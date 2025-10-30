@@ -1,0 +1,16 @@
+.lock {
+    .mat-icon{
+        min-height: 0.5rem;
+        color: rgb(45 212 191);
+        height: 20px;
+    }
+}
+
+#mat-select ::ng-deep .mat-mdc-select {
+    width: 45% !important;
+}
+
+:host ::ng-deep .mdc-checkbox .mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background{
+    border-color: black !important;
+    background-color: black !important;
+}

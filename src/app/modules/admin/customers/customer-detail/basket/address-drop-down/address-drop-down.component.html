@@ -1,0 +1,9 @@
+<mat-form-field class="w-100" style="width: 100% !important;">
+    <mat-label>Select an Address</mat-label>
+    <mat-select [(ngModel)]="selectedValue" (selectionChange)="onSelected()"  [ngModelOptions]="{standalone: true}">
+      <mat-option *ngFor="let option of addressesList" [value]="option.id">
+        {{ option.address1 }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  

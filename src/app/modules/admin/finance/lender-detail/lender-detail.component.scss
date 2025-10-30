@@ -1,0 +1,17 @@
+
+::ng-deep .mat-mdc-tab-labels  {
+    display: flex;
+    width: 30%;
+}
+
+::ng-deep .mat-mdc-tab .mdc-tab-indicator__content--underline {
+    border-color: transparent !important;
+    height: 45px;
+    font-weight: 600;
+    border-bottom: 3px solid #4f46e5 !important;
+}
+
+::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+    font-weight: 600;
+    color: #4f46e5;
+}

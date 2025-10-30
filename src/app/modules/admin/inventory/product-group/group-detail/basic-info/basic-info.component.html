@@ -1,0 +1,195 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/productgroups']" class="whitespace-nowrap text-primary-500">Product Groups</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Basic Details</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    Basic Details
+                </h2>
+            </div>
+            <div class="flex flex-auto mt-5 w-full justify-between" *ngIf="selectedProductGroup">
+                <div>
+                    <button mat-flat-button [color]="'warn'" (click)="openModal(archiveProductModal)"
+                        class="mr-2 btn btn-danger">Archive</button>
+                    <button mat-flat-button [color]="'primary'" (click)="openModal(liveProductGroupModal)"
+                        *ngIf="!selectedProductGroup.approvedAt" class="mr-2 btn btn-success">Publish</button>
+                    <button mat-flat-button [color]="'warn'" (click)="openModal(hideProductGroupModal)"
+                        *ngIf="selectedProductGroup.approvedAt" class="btn btn-danger">Unpublish</button>
+                </div>
+            </div>
+        </div>
+        <button class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last" mat-icon-button (click)="toggleDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="flex-auto p-6 sm:p-10">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <fuse-alert *ngIf="userForm.invalid && formSubmitted" class="my-3" [appearance]="'outline'"
+                [type]="'warning'">
+                Please fill in all the required fields.
+            </fuse-alert>
+        <form (ngSubmit)="onSubmit()" [formGroup]="userForm">
+            <mat-form-field class="fuse-mat-no-subscript w-full mb-5">
+                <mat-label>Name*</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                </mat-icon>
+                <input matInput [formControlName]="'name'" [placeholder]="'Name'" [spellcheck]="false">
+            </mat-form-field>
+            <div class="grid grid-cols-2 gap-4">
+
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Content location</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                        [svgIcon]="'heroicons_solid:office-building'">
+                    </mat-icon>
+                    <mat-select matInput formControlName="contentLocation">
+                        <mat-option value="homePage">Home Page</mat-option>
+                        <mat-option value="homePageAdvert">Advert</mat-option>
+                        <mat-option value="homePageFeed">Home Page Feed</mat-option>
+
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Orientation</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                        [svgIcon]="'heroicons_solid:office-building'">
+                    </mat-icon>
+                    <mat-select matInput formControlName="orientation">
+                        <mat-option value="vertical">Vertical</mat-option>
+                        <mat-option value="horizontal">Horizontal</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Displayed Date From*</mat-label>
+                    <input matInput [matDatepicker]="picker" [formControlName]="'displayedDateFrom'">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Displayed Date To*</mat-label>
+                    <input matInput [matDatepicker]="picker2" [formControlName]="'displayedDateTo'">
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-datepicker #picker2></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Displayed Time From</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'displayedTimeFrom'" [placeholder]="'displayedTimeFrom'"
+                        [spellcheck]="false">
+                </mat-form-field>
+
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Displayed Time To</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'displayedTimeTo'" [placeholder]="'displayedTimeTo'"
+                        [spellcheck]="false">
+                </mat-form-field>
+            </div>
+
+            <mat-form-field class="fuse-mat-no-subscript w-full my-5">
+                <mat-label>Description</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                </mat-icon>
+                <textarea matInput [formControlName]="'description'" [placeholder]="'description'"
+                    [spellcheck]="false"></textarea>
+            </mat-form-field>
+            <button mat-flat-button [color]="'primary'" class="mt-1 btn btn-primary" type="submit">Save</button>
+        </form>
+    </div>
+</div>
+
+<ng-template #archiveProductModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Archive: {{ selectedProductGroup.name }}</h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to archive
+            <strong>{{ selectedProductGroup.name }} </strong>? You will NOT be able
+            to use this product again for any subsequent bookings or make any changes?
+            It will be disabled from all interaction
+        </p>
+    </div>
+    <div class="modal-footer mt-3">
+        <button mat-flat-button [color]="'accent'" (click)="closeModal()" class="btn btn-outline-secondary" type="button">
+            Cancel
+        </button>
+        <button mat-flat-button [color]="'warn'" (click)="archive()" class="ml-2 btn btn-danger" type="button">
+            Archive
+        </button>
+
+        <button *ngIf="isLoadingObs | async" class="btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #liveProductGroupModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Go live: {{selectedProductGroup.name }} </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>Are you sure you want to out this product live <strong>{{selectedProductGroup.name }} </strong>? This product
+            will be available to purchase!</p>
+    </div>
+    <div class="modal-footer mt-3">
+        <button mat-flat-button [color]="'accent'" (click)="closeModal()" class="btn btn-outline-secondary"
+            type="button">Cancel</button>
+        <button mat-flat-button [color]="'primary'" (click)="liveProductGroup()" class="ml-2 btn btn-danger" type="button">LIVE</button>
+
+        <button *ngIf="isLoadingObs | async" class="btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #hideProductGroupModal let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Hide: {{selectedProductGroup.name }} </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>Are you sure you want to out hide this product <strong>{{selectedProductGroup.name }} </strong>? This product
+            will be NOT available to purchase!</p>
+    </div>
+    <div class="modal-footer mt-3">
+        <button mat-flat-button [color]="'accent'" (click)="closeModal()" class="btn btn-outline-secondary"
+            type="button">Cancel</button>
+        <button mat-flat-button [color]="'primary'" (click)="hideProductGroup()" class="ml-2 btn btn-danger" type="button">HIDE</button>
+
+        <button *ngIf="isLoadingObs | async" class="btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>

@@ -1,0 +1,75 @@
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+
+    <div class="relative py-8 px-6 md:px-8 border-b">
+        <div class="">
+            <div class="text-4xl font-extrabold tracking-tight">
+                Suppliers
+            </div>
+            <div class="mt-2">
+                <button [routerLink]="['add']" mat-flat-button [color]="'primary'">
+                    <mat-icon [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                    <span class="ml-2 mr-1">Add New</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-auto overflow-hidden">
+        <div class="flex flex-col flex-auto overflow-hidden sm:overflow-y-auto relative">
+            <table class="w-full bg-transparent" mat-table [dataSource]="dataSource">
+
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                        Account Number
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{element.accountNumber || 'N/A'}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>
+                        Name
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{element.name || 'N/A'}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="created">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                        Email
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{element.emailAddress || 'N/A'}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="action">
+                    <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                        Actions
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <button [routerLink]="[element.id]" mat-flat-button [color]="'primary'">
+                            View
+                        </button>
+                        <button class="ml-2" (click)="deleteSupplier(element.id)" mat-flat-button [color]="'warn'">
+                            Delete
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr class="bg-white shadow" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <tr class="order-row h-16" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+            <fuse-alert class="mt-4" *ngIf="errorMsg || totalAccounts == 0" [appearance]="'outline'"
+                [type]="'warning'">
+                {{errorMsg ? errorMsg : 'No records found'}}
+            </fuse-alert>
+        </div>
+    </div>
+    <mat-paginator (page)="paginate($event)" [length]="totalAccounts" [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+    </mat-paginator>
+</div>

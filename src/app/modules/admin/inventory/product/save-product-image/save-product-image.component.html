@@ -1,0 +1,27 @@
+
+<fuse-alert *ngIf="form.invalid && formSubmitted" class="my-3" [appearance]="'outline'"
+[type]="'warning'">
+Please fill in all the required fields.
+</fuse-alert>
+<form [formGroup]="form">
+    <div class="position-relative form-group my-3">
+        <app-image-upload
+            (onImageUpload)="onImageUpload($event)"
+            [contentType]="'product'"
+            [contentId]="product.id"
+            [publicImageUrl]="productImage?.publicUrl"
+        >
+        </app-image-upload>
+    </div>
+    <div class="modal-footer mt-4">
+        <button
+            (click)="onArchive()"
+            mat-flat-button
+            [color]="'warn'"
+            *ngIf="productImage"
+            type="button"
+        >
+            Archive
+        </button>
+    </div>
+</form>

@@ -1,0 +1,76 @@
+<div class="grid grid-cols-1 ms-3 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-4 sm:mt-4" *ngIf="decision;else noData">
+    <div class="flex flex-col h-86 overflow-hidden">
+        <div class="text-xl font-bold tracking-tight">Input Variables</div>
+        <mat-list>
+            <mat-list-item class="border-b-2 tracking-tighter text-sm" *ngFor="let item of decision?.inputVariables">
+                <label class="w-32 opacity-50">{{ item.property.description }}</label>
+            </mat-list-item>
+        </mat-list>
+    </div>
+    <div class="flex flex-col h-86 overflow-hidden" *ngIf="decision?.affordability">
+        <div class="text-xl font-bold tracking-tight">Output Variables</div>
+        <mat-list>
+            <mat-list-item class="border-b-2 tracking-tighter text-sm"><label class="w-32 opacity-50">Eligible</label>
+                <div *ngIf="decision?.affordability?.eligible"
+                    class="py-0.5 px-3 text-sm font-semibold text-teal-400 bg-green-100 dark:bg-green-100">Passed</div>
+
+                <div *ngIf="!decision?.affordability?.eligible"
+                    class="py-0.5 px-3 text-sm font-semibold text-blue-400 bg-red-100 dark:bg-red-100">Failed</div>
+            </mat-list-item>
+            <span *ngIf="decision?.affordability?.eligible">
+                <mat-list-item class="border-b-2 tracking-tighter text-sm"><label class="w-32 opacity-50">Interest Rate
+                        Type</label><span>{{ decision?.product?.interestRateType }}</span>
+                </mat-list-item>
+                <mat-list-item class="border-b-2 tracking-tighter text-sm"><label
+                        class="w-32 opacity-50">APR</label><span>{{ decision?.product?.interestRate }}%</span>
+                </mat-list-item>
+                <mat-list-item class="border-b-2 tracking-tighter text-sm"><label class="w-32 opacity-50">Maximum Loan
+                        Ammount</label><span>{{ decision?.affordability?.maxBorrowing / 100 | currency :
+                        decision?.affordability.currency }}</span>
+                </mat-list-item>
+
+                <mat-list-item class="border-b-2 tracking-tighter text-sm"><label
+                        class="w-32 opacity-50">Term</label><span>{{ decision?.product?.calculation?.term }}</span>
+                </mat-list-item>
+
+                <mat-list-item class="border-b-2 tracking-tighter text-sm"><label class="w-32 opacity-50">Monthly
+                        Payment</label><span>{{ decision?.product?.calculation?.monthlyPayment / 100 | currency :
+                        decision?.affordability.currency }}</span>
+                </mat-list-item>
+
+                <mat-list-item class="border-b-2 tracking-tighter text-sm"><label class="w-32 opacity-50">Total Amount
+                        Of Credit</label><span>{{ decision?.product?.calculation?.totalAmountOfCredit / 100 | currency :
+                        decision?.affordability.currency }}</span>
+                </mat-list-item>
+
+                <mat-list-item class="border-b-2 tracking-tighter text-sm"><label class="w-32 opacity-50">Total
+                        Charge</label><span>{{ decision?.product?.calculation?.totalChargePayable / 100 | currency :
+                        decision?.affordability.currency }}</span>
+                </mat-list-item>
+
+                <mat-list-item class="tracking-tighter text-sm"><label class="w-32 opacity-50">Monthly Payment to
+                        Income</label><span>{{ decision?.affordability?.monthlyPaymentToIncomePercentage }}%</span>
+                </mat-list-item>
+            </span></mat-list>
+    </div>
+    <div class="flex flex-col h-86 overflow-hidden">
+        <div class="text-xl font-bold tracking-tight">Processing Details</div>
+
+        <mat-list>
+            <mat-list-item *ngFor="let item of decision?.audits" class="border-b-2 tracking-tighter text-sm"><label
+                    class="w-32 opacity-50">{{ item.rule.name }}</label>
+                <div *ngIf="item.result"
+                    class="py-0.5 px-3 text-sm font-semibold text-teal-400 bg-green-100 dark:bg-green-100">Passed</div>
+
+                <div *ngIf="!item.result"
+                    class="py-0.5 px-3 text-sm font-semibold text-blue-400 bg-red-100 dark:bg-red-100">Failed</div>
+            </mat-list-item>
+        </mat-list>
+    </div>
+</div>
+
+<ng-template #noData>
+    <fuse-alert class="my-4" *ngIf="!decision || errorMsg" [appearance]="'outline'" [type]="'warning'">
+        {{errorMsg ? errorMsg : 'No records found'}}
+    </fuse-alert>
+</ng-template>

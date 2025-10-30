@@ -1,0 +1,65 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent"
+    >
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a
+                        [routerLink]="['/admin/customers']"
+                        class="whitespace-nowrap text-primary-500"
+                        >Customers</a
+                    >
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon
+                        class="icon-size-5 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"
+                    ></mat-icon>
+                    <span class="ml-1 text-secondary">Affordability</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2
+                    class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate"
+                >
+                    Affordability
+                </h2>
+            </div>
+        </div>
+        <button
+            class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last"
+            mat-icon-button
+            (click)="toggleDrawer()"
+        >
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+    <div class="">
+        <div class="flex-auto m-4">
+            <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+            <fuse-alert *ngIf="!affordabilityData && !(isLoadingObs | async)" [appearance]="'outline'"
+            [type]="'warning'">
+                {{'No Affordability Found'}}
+            </fuse-alert>
+            <div class="py-6 px-3 rounded-md shadow flex-column bg-card d-flex justify-between w-100 gap-3.5" *ngIf="affordabilityData && !(isLoadingObs | async)">
+                <div class="d-flex justify-between">
+                    <label class="w-32 opacity-50">Maximum Monthly Borrowing</label>
+                    <div>
+                        {{ (affordabilityData?.maximumMonthlyBorrowing || 0) / 100 | currency : affordabilityData?.currency }}
+                    </div>
+                </div>
+                <div class="d-flex justify-between">
+                    <label class="w-32 opacity-50">Eligible</label>
+                    <div *ngIf="affordabilityData?.eligible === true" class="py-0.5 px-3 text-sm font-semibold text-teal-400 bg-green-100 dark:bg-green-100" style="height: 24px;">Passed</div>
+                    <div *ngIf="affordabilityData?.eligible === false" class="py-0.5 px-3 text-sm font-semibold text-blue-400 bg-red-100 dark:bg-red-100" style="height: 24px;">Failed</div>
+                </div>
+    
+            </div>
+        </div> 
+    
+    </div>
+</div>

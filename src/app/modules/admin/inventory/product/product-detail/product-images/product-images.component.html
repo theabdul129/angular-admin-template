@@ -1,0 +1,87 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/products']" class="whitespace-nowrap text-primary-500">Products</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Product Images</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    Images
+                </h2>
+            </div>
+        </div>
+        <button class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last" mat-icon-button (click)="toggleDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="flex-auto p-3">
+        <button (click)="openProductImage(productImage, null)" mat-flat-button [color]="'primary'">
+            Upload
+        </button>
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <div class="flex flex-column sm:flex-row">
+            <div class="flex-auto mr-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4" *ngIf="selectedProduct">
+                    <div class="p-3 bg-card border shadow rounded-2xl overflow-hidden"
+                        *ngFor="let image of selectedProduct.images">
+                        <img class="mx-auto product-slide" [src]="image.publicUrl"
+                            onError="this.src='assets/images/no-image.jpg'" />
+                        <h3 class="text-2xl tracking-tight my-2">{{ image.description }}</h3>
+                        <button class="mt-2" type="button" mat-flat-button [color]="'primary'"
+                            (click)="openProductImage(productImageView, image)">
+                            View
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-none w-full mt-2 sm:w-64">
+                <div class="p-5 rounded-2xl sm:rounded-md shadow bg-card mr-4 sm:mr-0" *ngIf="selectedProduct">
+                    <product-info [data]="selectedProduct"></product-info>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #productImage let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title" *ngIf="selectedProductImage">
+            Product Image: {{ selectedProductImage.description }}
+        </h4>
+        <h4 class="mat-dialog-title" *ngIf="!selectedProductImage">
+            New Product Image
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body" *ngIf="selectedProduct">
+        <app-save-product-image (onSave)="updateProductImages()" [(productImage)]="selectedProductImage"
+            [product]="selectedProduct"></app-save-product-image>
+    </div>
+</ng-template>
+
+<ng-template #productImageView let-modal>
+    <app-preview-image
+        *ngIf="selectedProductImage"
+        [title]="'Product Image Preview'"
+        [selectedImageUrl]="selectedProductImage.publicUrl"
+        [description]="selectedProductImage.description"
+        [needArchive]="true"
+        [product]="selectedProduct"
+        (closeModal)="closeModal()"
+        (OnArchive)="onArchive(selectedProductImage.id)"
+    ></app-preview-image>
+</ng-template>

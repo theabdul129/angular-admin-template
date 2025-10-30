@@ -1,0 +1,7 @@
+<form [formGroup]="productInventoryForm">
+  <search-product formControlName="productId"></search-product>
+  <div class="modal-footer">
+    <button [disabled]="productInventoryForm.invalid" mat-flat-button [color]="'primary'" (click)="onSubmit()" class="mt-4 btn btn-primary"
+      type="button">Save</button>
+  </div>
+</form>

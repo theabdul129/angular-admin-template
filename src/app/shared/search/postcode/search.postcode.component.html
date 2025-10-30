@@ -1,0 +1,13 @@
+<mat-form-field class="example-full-width w-full" appearance="fill">
+  <mat-label>Postcode*</mat-label>
+  <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:archive'"></mat-icon>
+  <input [(ngModel)]="selectedPostcode" #input type="text" placeholder="Postcode" aria-label="Number" matInput [matAutocomplete]="auto">
+  <mat-autocomplete #auto="matAutocomplete">
+    <mat-option (onSelectionChange)="selected(option.postcode)" *ngFor="let option of filteredOptions"
+      [value]="option.postcode">
+      {{option.postcode}}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>
+<span *ngIf="searching">searching...</span>
+<div class="invalid-feedback" *ngIf="searchFailed">Sorry, suggestions could not be loaded.</div>

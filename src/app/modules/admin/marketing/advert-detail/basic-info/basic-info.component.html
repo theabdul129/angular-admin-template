@@ -1,0 +1,214 @@
+<div class="flex flex-col flex-auto min-w-0">
+    <!-- Header -->
+    <div class="
+            flex flex-col
+            sm:flex-row
+            flex-0
+            sm:items-center sm:justify-between
+            p-6
+            sm:py-8 sm:px-10
+            border-b
+            bg-card
+            dark:bg-transparent
+        ">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/adverts']" class="whitespace-nowrap text-primary-500">Adverts</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Basic Details</span>
+                </div>
+            </div>
+
+
+            <div class="flex flex-auto mt-5 w-full justify-between" *ngIf="selectedAdvert">
+                <div>
+                    <button *ngIf="!selectedAdvert.approvedAt" (click)="openModal(publishModal)" class="mr-2"
+                        mat-flat-button [color]="'primary'">
+                        Publish
+                    </button>
+                    <button *ngIf="selectedAdvert.approvedAt" (click)="openModal(unpublishModal)" class="mr-2"
+                        mat-flat-button [color]="'warn'">
+                        Unpublish
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <button class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last" mat-icon-button (click)="toggleDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="flex-auto p-6 sm:p-10">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <fuse-alert *ngIf="form.invalid && formSubmitted" class="my-3" [appearance]="'outline'"
+                [type]="'warning'">
+                Please fill in all the required fields.
+            </fuse-alert>
+        <form (ngSubmit)="onSubmit()" [formGroup]="form">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Name*</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'name'" [placeholder]="'name'" [spellcheck]="false" />
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Public title</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'title'" [placeholder]="'Public title'" [spellcheck]="true" />
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Public Description</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:document-text'">
+                    </mat-icon>
+                    <textarea matInput [formControlName]="'description'" [placeholder]="'Public description'"
+                        [spellcheck]="true"></textarea>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Advert body*</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:document-text'">
+                    </mat-icon>
+                    <textarea matInput [formControlName]="'body'" [placeholder]="'Advert body'"
+                        [spellcheck]="true"></textarea>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Advert type*</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                        [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                    <mat-select matInput formControlName="actionType">
+                        <mat-option value="">General</mat-option>
+                        <mat-option value="group">Group</mat-option>
+                        <mat-option value="brand">Brand</mat-option>
+                        <mat-option value="recipe">Recipe</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Button Label</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'callToActionLabel'" [placeholder]="'callToActionLabel'"
+                        [spellcheck]="false" />
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Content Type</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                        [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                    <mat-select matInput formControlName="contentType">
+                        <mat-option value="image">Image</mat-option>
+                        <mat-option value="video">Video</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Json</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:document-text'">
+                    </mat-icon>
+                    <textarea matInput [formControlName]="'actionParams'" [placeholder]="'actionParams'"
+                        [spellcheck]="false"></textarea>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Displayed Date From</mat-label>
+                    <input matInput [matDatepicker]="picker" [formControlName]="'displayedDateFrom'" />
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Displayed Date To</mat-label>
+                    <input matInput [matDatepicker]="picker2" [formControlName]="'displayedDateTo'" />
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-datepicker #picker2></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Display on error</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                        [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                    <mat-select matInput formControlName="errorCode">
+                        <mat-option value="">None</mat-option>
+                        <mat-option value="8000">No Couriers available</mat-option>
+                        <mat-option value="8100">Customer our of catchment area</mat-option>
+                        <mat-option value="8200">Store closed</mat-option>
+                        <mat-option value="8400">No user location</mat-option>
+
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                    <mat-label>Position</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:selector'">
+                    </mat-icon>
+                    <input matInput [formControlName]="'orderPosition'" [placeholder]="'Position'"
+                        [spellcheck]="false" />
+                </mat-form-field>
+            </div>
+
+            <button button mat-flat-button [color]="'primary'" class="mt-1 btn btn-primary" type="submit">
+                Save
+            </button>
+        </form>
+    </div>
+</div>
+
+<ng-template #publishModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Publish: {{ selectedAdvert.name }}</h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to out this advert live
+            <strong>{{ selectedAdvert.name }} </strong>? This advert will be
+            available on the public platforms !
+        </p>
+    </div>
+    <div class="modal-footer mt-4">
+        <button (click)="closeModal()" *ngIf="!(isLoadingObs | async)" class="btn btn-outline-secondary" type="button"
+            mat-flat-button [color]="'accent'">
+            Cancel
+        </button>
+        <button (click)="publish()" *ngIf="!(isLoadingObs | async)" class="ml-2 btn btn-danger" type="button"
+            mat-flat-button [color]="'primary'">
+            Publish
+        </button>
+
+        <button *ngIf="isLoadingObs | async" class="btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #unpublishModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Hide: {{ selectedAdvert.name }}</h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to out hide this advert
+            <strong>{{ selectedAdvert.name }} </strong>? This advert will be remove from the public!
+        </p>
+    </div>
+    <div class="modal-footer mt-3">
+        <button (click)="closeModal()" *ngIf="!(isLoadingObs | async)" class="btn btn-outline-secondary" type="button"
+            mat-flat-button [color]="'accent'">
+            Cancel
+        </button>
+        <button (click)="unpublish()" *ngIf="!(isLoadingObs | async)" class="btn btn-danger ml-2" type="button"
+            mat-flat-button [color]="'warn'">
+            Unpublish
+        </button>
+
+        <button *ngIf="isLoadingObs | async" class="btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>

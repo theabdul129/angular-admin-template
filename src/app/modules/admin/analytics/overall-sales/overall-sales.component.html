@@ -1,0 +1,256 @@
+<div class="flex flex-col flex-auto w-full">
+    <div class="flex flex-wrap w-full max-w-screen-xl mx-auto p-6 md:p-8">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <!-- Title and action buttons -->
+        <div class="flex items-center justify-between w-full">
+            <div>
+                <div class="text-3xl font-semibold tracking-tight leading-8">Analytics</div>
+                <div class="font-medium tracking-tight text-secondary">Monitor sales, best products and review
+                    performance</div>
+            </div>
+            <div>
+                <button (click)="exportReport(null)" class="hidden sm:inline-flex" mat-flat-button [color]="'primary'">
+                    <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:save'"></mat-icon>
+                    <span class="ml-2">Export</span>
+                </button>
+
+                <!-- Actions menu (visible on xs) -->
+                <div class="sm:hidden">
+                    <button [matMenuTriggerFor]="actionsMenu" mat-icon-button>
+                        <mat-icon [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
+                    </button>
+                    <mat-menu #actionsMenu="matMenu">
+                        <button mat-menu-item>Export</button>
+                        <button mat-menu-item>Settings</button>
+                    </mat-menu>
+                </div>
+            </div>
+        </div>
+        <div class="grid gap-4 grid-cols-4 mt-5 w-full">
+            <mat-form-field class="relative">
+                <mat-label>Store</mat-label>
+                <mat-select [formControl]="storeCtrl" placeholder="Store" [multiple]="true" #multiSelect>
+                    <mat-option>
+                        <ngx-mat-select-search placeholderLabel="Find Store..."
+                            noEntriesFoundLabel="No matching store found" [formControl]="storeFilterCtrl">
+                        </ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let item of filterStores | async" [value]="item.id">
+                        {{item.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="relative">
+                <mat-label>Product</mat-label>
+                <mat-select [formControl]="productCtrl" placeholder="Product" [multiple]="true" #multiSelect>
+                    <mat-option>
+                        <ngx-mat-select-search placeholderLabel="Find Product..."
+                            noEntriesFoundLabel="No matching product found" [formControl]="productFilterCtrl">
+                        </ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let item of filterproducts | async" [value]="item.id">
+                        {{item.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="relative">
+                <mat-label>Category</mat-label>
+                <mat-select [formControl]="categoryCtrl" placeholder="Category" [multiple]="true" #multiSelect>
+                    <mat-option>
+                        <ngx-mat-select-search placeholderLabel="Find Category..."
+                            noEntriesFoundLabel="No matching category found" [formControl]="categoryFilterCtrl">
+                        </ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let item of filtercategory | async" [value]="item.id">
+                        {{item.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="relative">
+                <mat-label>Catchment Area</mat-label>
+                <mat-select [formControl]="catchmentCtrl" placeholder="Catchment Area" [multiple]="true" #multiSelect>
+                    <mat-option>
+                        <ngx-mat-select-search placeholderLabel="Find Catchment Area..."
+                            noEntriesFoundLabel="No matching catchment area found" [formControl]="catchmentFilterCtrl">
+                        </ngx-mat-select-search>
+                    </mat-option>
+                    <mat-option *ngFor="let item of filtercatchments | async" [value]="item.id">
+                        {{item.name}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field class="">
+                <mat-label>Enter a date range</mat-label>
+                <mat-date-range-input [formGroup]="dateRange" [rangePicker]="picker">
+                    <input matStartDate formControlName="start" placeholder="Start date" #startDate>
+                    <input matEndDate formControlName="end" placeholder="End date" #endDate>
+                </mat-date-range-input>
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-date-range-picker #picker>
+                </mat-date-range-picker>
+            </mat-form-field>
+            <mat-form-field class="">
+                <mat-label>Report Period</mat-label>
+                <mat-select matInput [(ngModel)]="reportPeriod">
+                    <mat-option value="hour">Hour</mat-option>
+                    <mat-option value="day">Day</mat-option>
+                    <mat-option value="week">Week</mat-option>
+                    <mat-option value="month">Month</mat-option>
+                    <mat-option value="quarter">Quarter</mat-option>
+                    <mat-option value="year">Year</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div class="pt-6">
+                <button (click)="applyFilter()" class="ml-2" mat-flat-button [color]="'primary'">
+                    Apply
+                </button>
+                <button (click)="clearFilter()" class="ml-2" mat-flat-button [color]="'warn'">
+                    Clear
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-8">
+            <!-- Visitors overview -->
+            <div *ngIf="orderReportOptions"
+                class="sm:col-span-2 lg:col-span-3 dark flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
+                <div class="flex items-center justify-between mt-10 ml-10 mr-6 sm:mr-10">
+                    <div class="flex flex-col">
+                        <div class="mr-4 text-2xl md:text-3xl font-semibold tracking-tight leading-7">Sales Overview
+                        </div>
+
+                    </div>
+                    <div class="ml-2">
+                        <mat-button-toggle-group class="hidden sm:inline-flex border-none space-x-1" value="revenue"
+                            #seriesSelector="matButtonToggleGroup">
+                            <mat-button-toggle class="px-1.5 rounded-full overflow-hidden border-none font-medium"
+                                value="revenue">Revenue
+                            </mat-button-toggle>
+                            <mat-button-toggle class="px-1.5 rounded-full overflow-hidden border-none font-medium"
+                                value="orders">Orders
+                            </mat-button-toggle>
+
+                            <mat-button-toggle class="px-1.5 rounded-full overflow-hidden border-none font-medium"
+                                value="credits">Credits
+                            </mat-button-toggle>
+
+                            <mat-button-toggle class="px-1.5 rounded-full overflow-hidden border-none font-medium"
+                                value="deliveryCharge">Delivery fees
+                            </mat-button-toggle>
+                        </mat-button-toggle-group>
+                        <div class="sm:hidden">
+                            <button mat-icon-button [matMenuTriggerFor]="seriesSelector">
+                                <mat-icon [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
+                            </button>
+                            <mat-menu #seriesSelector="matMenu">
+                                <button mat-menu-item>Order</button>
+                                <button mat-menu-item>Revenue</button>
+                                <button mat-menu-item>Credits</button>
+                                <button mat-menu-item>Delivery fees</button>
+                            </mat-menu>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col flex-auto h-80">
+
+                    <apx-chart class="flex-auto w-full h-full" [chart]="orderReportOptions.chart"
+                        [colors]="orderReportOptions.colors" [dataLabels]="orderReportOptions.dataLabels"
+                        [fill]="orderReportOptions.fill" [grid]="orderReportOptions.grid"
+                        [series]="orderReportOptions.series[seriesSelector.value]" [stroke]="orderReportOptions.stroke"
+                        [tooltip]="orderReportOptions.tooltip" [xaxis]="orderReportOptions.xaxis"
+                        [yaxis]="orderReportOptions.yaxis"></apx-chart>
+                </div>
+            </div>
+            <!-- Conversions  -->
+            <div *ngIf="orderReportData"
+                class="sm:col-span-2 lg:col-span-1 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
+                <div class="flex items-start justify-between m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Net product</div>
+                </div>
+                <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
+                    <div class="text-4xl font-bold tracking-tighter leading-tight">
+                        {{currency +' '+ (orderReportData.productSeries.amount | number:'1.2-2')}}</div>
+                    <div class="flex lg:flex-col lg:ml-3">
+                    </div>
+                </div>
+                <div class="flex flex-col flex-auto h-20">
+                    <apx-chart class="flex-auto w-full h-full" [chart]="productChargeReportOptions.chart"
+                        [colors]="productChargeReportOptions.colors" [series]="productChargeReportOptions.series"
+                        [stroke]="productChargeReportOptions.stroke" [tooltip]="productChargeReportOptions.tooltip"
+                        [xaxis]="productChargeReportOptions.xaxis" [yaxis]="productChargeReportOptions.yaxis">
+                    </apx-chart>
+                </div>
+            </div>
+
+            <div *ngIf="orderReportData"
+                class="sm:col-span-2 lg:col-span-1 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
+                <div class="flex items-start justify-between m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Net Delivery</div>
+                </div>
+                <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
+                    <div class="text-4xl font-bold tracking-tighter leading-tight">
+                        {{currency +' '+ (orderReportData.deliverySeries.amount | number:'1.2-2')}}</div>
+                    <div class="flex lg:flex-col lg:ml-3">
+                    </div>
+                </div>
+                <div class="flex flex-col flex-auto h-20">
+                    <apx-chart class="flex-auto w-full h-full" [chart]="deliveryReportOptions.chart"
+                        [colors]="deliveryReportOptions.colors" [series]="deliveryReportOptions.series"
+                        [stroke]="deliveryReportOptions.stroke" [tooltip]="deliveryReportOptions.tooltip"
+                        [xaxis]="deliveryReportOptions.xaxis" [yaxis]="deliveryReportOptions.yaxis">
+                    </apx-chart>
+                </div>
+            </div>
+
+            <div *ngIf="orderReportData"
+                class="sm:col-span-2 lg:col-span-1 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
+                <div class="flex items-start justify-between m-6 mb-0">
+                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Net Total</div>
+                </div>
+                <div class="flex flex-col lg:flex-row lg:items-center mx-6 mt-3">
+                    <div class="text-4xl font-bold tracking-tighter leading-tight">
+                        {{currency +' '+ (orderReportData.totalSeries.amount | number:'1.2-2')}}</div>
+                    <div class="flex lg:flex-col lg:ml-3">
+                    </div>
+                </div>
+                <div class="flex flex-col flex-auto h-20">
+                    <apx-chart class="flex-auto w-full h-full" [chart]="totalReportOptions.chart"
+                        [colors]="totalReportOptions.colors" [series]="totalReportOptions.series"
+                        [stroke]="totalReportOptions.stroke" [tooltip]="totalReportOptions.tooltip"
+                        [xaxis]="totalReportOptions.xaxis" [yaxis]="totalReportOptions.yaxis">
+                    </apx-chart>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-4 mt-7 w-full">
+            <div class="bg-card shadow text-center p-4 rounded-2xl">
+                <div class="text-lg font-medium tracking-tight leading-6 truncate">Orders</div>
+                <div class="text-5xl font-bold tracking-tighter leading-tight">
+                    4654
+                </div>
+            </div>
+            <div class="bg-card shadow text-center p-4 rounded-2xl">
+                <div class="text-lg font-medium tracking-tight leading-6 truncate">Average basket size
+                </div>
+                <div class="text-5xl font-bold tracking-tighter leading-tight">
+                    $654
+                </div>
+            </div>
+            <div class="bg-card shadow text-center p-4 rounded-2xl">
+                <div class="text-lg font-medium tracking-tight leading-6 truncate">New Cusromers
+                </div>
+                <div class="text-5xl font-bold tracking-tighter leading-tight">
+                    45
+                </div>
+            </div>
+            <div class="bg-card shadow text-center p-4 rounded-2xl">
+                <div class="text-lg font-medium tracking-tight leading-6 truncate">Returning Customers
+                </div>
+                <div class="text-5xl font-bold tracking-tighter leading-tight">
+                    48
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

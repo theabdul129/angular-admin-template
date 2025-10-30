@@ -1,0 +1,12 @@
+<table class="w-full border-collapse ">
+    <thead>
+        <tr>
+            <th *ngFor="let label of labels" class="border-b py-2">{{ label }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let row of dataSource; let isFirst = first" class="{{ !isFirst ? 'border-b' : '' }}">
+            <td *ngFor="let value of row" class="py-2">{{ value }}</td>
+        </tr>
+    </tbody>
+</table>

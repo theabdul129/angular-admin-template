@@ -1,0 +1,38 @@
+.branding{
+    width: 180px;
+}
+.pad {
+    padding: 40px 20px;
+}
+@media (min-width: 576px){
+    .pad {
+        padding: 40px 20px;}
+}
+@media (min-width: 768px){
+    .pad {
+        padding: 50px;}
+}
+@media (min-width: 992px){
+    .pad {
+        padding: 100px;}    
+}
+.btn{
+    background-color: #1FAA9F!important;
+    border-color: #1FAA9F!important;
+    padding: .8rem 5.5rem!important;
+    font-size: 1.2rem!important;
+}
+.login-img {
+    width: 100%;
+    height: 100vh;
+    -o-object-fit: cover;
+    object-fit: cover;
+    -o-object-position: left;
+    object-position: left;
+}
+.custom-bg{
+    background: #f3f4f6;
+}
+.link-bskt, .link-bskt:focus, .link-bskt:hover {
+    color: #1FAA9F!important;
+}

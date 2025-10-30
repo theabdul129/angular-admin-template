@@ -1,0 +1,25 @@
+.Card {
+    position: relative; /* soo that i can relocate the options inside*/
+    background: var(--background);
+    padding: 30px;
+    border-radius: 15px;
+    margin: 10px;
+    box-shadow: var(--ui-shawdow);
+  }
+  .Fill{
+    width: 100%;
+    height: 100%;
+  }
+  .ChartContainer{
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+    height: 100%;
+  }
+  .ChartWraper{
+    height: 100%;
+    width: 100%;
+  }
+  canvas{
+    height: 40%;
+  }

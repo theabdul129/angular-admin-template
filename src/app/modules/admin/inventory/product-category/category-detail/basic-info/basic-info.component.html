@@ -1,0 +1,194 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/productcategories']" class="whitespace-nowrap text-primary-500">Product
+                        Categories</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Basic Details</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    Basic Details
+                </h2>
+            </div>
+            <div class="flex flex-auto mt-5 w-full justify-between">
+                <div *ngIf="selectedProductCategory">
+                    <button mat-flat-button [color]="'warn'" (click)="openModal(archiveProductCategoryModal)"
+                        class=" btn btn-danger">Archive</button>
+                    <button mat-flat-button [color]="'primary'" (click)="openModal(liveProductCategoryModal)"
+                        *ngIf="!selectedProductCategory.approvedAt" class="mx-2 btn btn-success">Publish</button>
+                    <button mat-flat-button [color]="'warn'" (click)="openModal(hideProductCategoryModal)"
+                        *ngIf="selectedProductCategory.approvedAt" class="btn ml-2 btn-danger">Unpublish</button>
+                </div>
+            </div>
+        </div>
+        <button class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last" mat-icon-button (click)="toggleDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="flex-auto p-6 sm:p-10">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <fuse-alert *ngIf="userForm.invalid && formSubmitted" class="my-3" [appearance]="'outline'"
+                [type]="'warning'">
+                Please fill in all the required fields.
+            </fuse-alert>
+        <form (ngSubmit)="onSubmit()" [formGroup]="userForm">
+            <div class="position-relative form-group">
+                <search-product-category formControlName="parentProductCategory" id="parentProductCategory">
+                </search-product-category>
+            </div>
+            <mat-form-field class="fuse-mat-no-subscript w-full mb-5 mt-2">
+                <mat-label>Name*</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+                </mat-icon>
+                <input matInput formControlName="name" [placeholder]="'Name'">
+            </mat-form-field>
+            <mat-form-field class="fuse-mat-no-subscript w-full mb-5">
+                <mat-label>Position</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:selector'">
+                </mat-icon>
+                <input matInput [formControlName]="'orderPosition'" [placeholder]="'Position'" [spellcheck]="false" />
+            </mat-form-field>
+            <mat-form-field class="fuse-mat-no-subscript w-full mb-5">
+                <mat-label>Description</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+                </mat-icon>
+                <textarea matInput formControlName="description" [placeholder]="'Description'"></textarea>
+            </mat-form-field>
+
+            <mat-checkbox [formControlName]="'popular'">Popular</mat-checkbox>
+
+            <div  class="mt-5">
+                <button mat-flat-button [color]="'primary'" type="submit">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<ng-template #productImageModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title" *ngIf="selectedProductImage">
+            Product Image: {{ selectedProductImage.description }}
+        </h4>
+        <h4 class="mat-dialog-title" *ngIf="!selectedProductImage">
+            New Product Image
+        </h4>
+        <button (click)="closeModal()" aria-describedby="mat-dialog-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <app-save-product-category-image (onSave)="updateProductImages()" [(productImage)]="selectedProductImage"
+            [productCategory]="selectedProductCategory"></app-save-product-category-image>
+    </div>
+</ng-template>
+
+<ng-template #archiveProductCategoryModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Archive: {{ selectedProductCategory.name }}</h4>
+        <button (click)="closeModal()" aria-describedby="mat-dialog-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to archive
+            <strong>{{ selectedProductCategory.name }} </strong>? You will NOT be able
+            to use this product again for any subsequent bookings or make any changes?
+            It will be disabled from all interaction
+        </p>
+    </div>
+    <div class="mt-3">
+        <button mat-flat-button [color]="'accent'" (click)="closeModal()" class="btn btn-outline-secondary"
+            type="button">
+            Cancel
+        </button>
+        <button mat-flat-button [color]="'warn'" (click)="archive()" class="btn btn-danger ml-2" type="button">
+            Archive
+        </button>
+
+        <button *ngIf="isLoadingObs | async" class="btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #productCategoryModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title" *ngIf="selectedChildProductCategory">
+            Product Category: {{ selectedChildProductCategory.name }}
+        </h4>
+        <h4 class="mat-dialog-title" *ngIf="!selectedChildProductCategory">
+            New Product Category
+        </h4>
+        <button (click)="closeModal()" aria-describedby="mat-dialog-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <app-save-child-product-category (onSave)="loadChildProductCategory()"
+            [parentProductCategoryId]="selectedProductCategory.id" [(productCategory)]="selectedChildProductCategory">
+        </app-save-child-product-category>
+    </div>
+</ng-template>
+
+<ng-template #liveProductCategoryModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Go live: {{selectedProductCategory.name }} </h4>
+        <button (click)="closeModal()" aria-describedby="mat-dialog-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>Are you sure you want to out this product live <strong>{{selectedProductCategory.name }} </strong>? This
+            product will be available to purchase!</p>
+    </div>
+    <div class="mt-3">
+        <button mat-flat-button [color]="'accent'" (click)="closeModal()" class="mr-2 btn btn-outline-secondary"
+            type="button">Cancel</button>
+        <button mat-flat-button [color]="'primary'" (click)="liveProductCategory()" class="btn btn-danger"
+            type="button">LIVE</button>
+
+        <button *ngIf="isLoadingObs | async" class="btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>
+
+
+<ng-template #hideProductCategoryModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Hide: {{selectedProductCategory.name }} </h4>
+        <button (click)="closeModal()" aria-describedby="mat-dialog-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>Are you sure you want to out hide this product <strong>{{selectedProductCategory.name }} </strong>? This
+            product will be NOT available to purchase!</p>
+    </div>
+    <div class="mt-3">
+        <button mat-flat-button [color]="'accent'" (click)="closeModal()" class="btn btn-outline-secondary"
+            type="button">Cancel</button>
+        <button mat-flat-button [color]="'warn'" (click)="hideProductCategory()" class="btn btn-danger ml-2"
+            type="button">HIDE</button>
+
+        <button *ngIf="isLoadingObs | async" class="btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>

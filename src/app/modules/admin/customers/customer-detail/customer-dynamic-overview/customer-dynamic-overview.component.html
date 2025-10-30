@@ -1,0 +1,102 @@
+<div class="flex justify-between items-center" *ngIf="customerDetail?.header || customerDetail?.bskt_score">
+    <div class="font-medium text-lg" *ngIf="customerDetail?.header">{{customerDetail?.header}}</div>
+    <div class="font-medium score-circle" *ngIf="customerDetail?.bskt_score">{{customerDetail?.bskt_score}} <br><span class="score">SCORE</span></div>
+</div>
+
+<div class="mt-6">
+    <div class="row">
+        <div class="col-12 col-sm-6" *ngFor="let recommend of customerDetail?.recommendations">
+            <div class="mt-4 px-2 bg-card shadow rounded py-7">
+                <div class="font-medium text-center my-4 px-5" *ngIf="recommend?.description">
+                    {{recommend?.description | plainEnglishCase}}
+                </div>
+
+                <div class="text-center">
+                    <img style="width: 100px; height: 100px; object-fit: cover;"
+                        class="mx-auto rounded-full border shadow" [src]="recommend?.product?.image_link"
+                        alt="product image" onError="this.src='assets/images/cards/car_image.jpeg'" />
+                    <div class="font-medium mt-2 text-xl font-extrabold " style="color: #1aab9e;">{{recommend?.product?.name}}</div>
+                </div>
+
+                <div class="details pl-4 pb-2">
+                    <div class="detailRecomendation mt-1 text-center" *ngFor="let item of recommend?.details">
+                        <ng-container *ngIf="item.type=='information ' && !item?.header">
+                            <div class="header font-medium text-lg text-secondary" *ngIf="item?.description">
+                                {{(removeUnderScore(item?.header)) | plainEnglishCase}}
+                            </div>
+                        </ng-container>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-1">
+                        <div class="detailRecomendation mt-1 text-center" *ngFor="let item of recommend?.details">
+                            <ng-container *ngIf="item.type=='information ' && item?.header">
+                                <div class="header font-bold" *ngIf="item?.header">
+                                    {{(removeUnderScore(item?.header)) | plainEnglishCase}}
+                                </div>
+                                <div class="header font-normal text-secondary" *ngIf="item?.description">
+                                    {{item?.description}}
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <div class="detailRecomendation mt-1" *ngFor="let item of recommendation?.details">
+                        <ng-container *ngIf="item.type=='action '">
+                            <div class="flex items-center">
+                                <mat-icon class="check_icon" [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                                <div class="header pl-2 font-normal" *ngIf="item?.description">
+                                    {{item?.description | plainEnglishCase}}
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+
+                <div class="font-medium sm:pl-4 pt-3 text-xl text-center font-extrabold " style="color: #1aab9e;" *ngIf="recommend?.business_outcomes?.length>0">{{'Business Outcomes' | plainEnglishCase}}</div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                    <div class="detailRecomendation mt-1 text-center" *ngFor="let item of recommend?.business_outcomes">
+                        <ng-container *ngIf="item.type=='information '">
+                            <div class="header font-bold" *ngIf="item?.header">
+                                {{(removeUnderScore(item?.header)) | plainEnglishCase}}
+                            </div>
+                            <div class="header font-normal text-secondary" *ngIf="item?.description">
+                                {{item?.description}}
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+
+                <div class="font-medium sm:pl-4 pt-3 text-sm text-xl text-center font-extrabold" style="color: #1aab9e;" *ngIf="recommend?.basket_recommendations?.length">Basket recommendations</div>
+
+                <div class="detailRecomendation px-4 mt-4 text-center"
+                    *ngFor="let bsktRecomend of recommend?.basket_recommendations">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <ng-container *ngFor="let item of bsktRecomend?.products">
+                            <div class="text-center">
+                                <img style="width: 70px; height: 70px; object-fit: cover;"
+                                    class="mx-auto rounded-full border shadow"
+                                    [src]="item?.image_link" alt="product image"
+                                    onError="this.src='assets/images/no-image.jpg'" />
+                                <div class="mt-2 font-medium ">{{item?.name}}</div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 future_plans" *ngIf="customerDetail?.future_plans?.length">
+            <div class="mt-4 bg-card shadow rounded px-7 py-1">
+                <div class="my-6 font-medium text-2xl font-extrabold" style="color: #1aab9e;">Future Plans</div>
+                <ul class="list-disc pl-6">
+                    <li *ngFor="let item of customerDetail?.future_plans" class="mb-2 text-normal">{{ item | plainEnglishCase }}</li>
+                </ul>
+
+                <div class="header font-medium pt-3 text-normal text-secondary">
+                    {{customerDetail?.follow_up | plainEnglishCase}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

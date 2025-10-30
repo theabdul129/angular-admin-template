@@ -1,0 +1,61 @@
+<div class="flex flex-col flex-auto min-w-0">
+  <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+  <div class="border-t -mt-px py-9 sm:py-6 px-8">
+    <div class="w-full max-w-screen-xl mx-auto">
+      <div
+        class="sm:col-span-2 md:col-span-4 lg:col-span-2 flex flex-col flex-auto overflow-hidden">
+        <div>
+          <h2 class="text-3xl font-semibold tracking-tight leading-8">Agent alerts running</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="dashboardData && dashboardData?.length>0">
+    <div class="flex-auto border-t -mt-px py-9 sm:py-6">
+      <div class="w-full max-w-screen-xl mx-auto">
+        <div class="sm:col-span-2 md:col-span-4 lg:col-span-2 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+          <div class="mt-3 sm:mt-0 sm:ml-2">
+            <div class="flex flex-col mt-2 divide-y">
+              <ng-container *ngFor="let scheduleItem of dashboardData; trackBy: trackByFn">
+                <div class="flex flex-row items-center justify-between py-4 px-0.5">
+                  <div class="flex flex-col">
+                    <div class="text-lg font-medium">{{ scheduleItem?.name }}</div>
+                    <div class="mt-2 text-md text-secondary">{{ scheduleItem?.query }}</div>
+                    <div class="mt-2 text-md font-medium">Last run date: <span class="text-secondary font-normal"> {{ scheduleItem?.run_datetime | date  }}</span></div>
+                    <div class="mt-2 text-md font-medium">Total customers found: <span class="text-secondary font-normal"> {{ scheduleItem?.customer_count  }}</span></div>
+                  </div>
+                  <button mat-icon-button (click)="goToDasboard(scheduleItem?.id)">
+                    <mat-icon [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                  </button>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="dashboardData?.length<1 && !(isLoadingObs | async)">
+    <div class="flex-auto border-t -mt-px py-9 sm:py-6">
+      <div class="w-full max-w-screen-xl mx-auto">
+        <div class="sm:col-span-2 md:col-span-4 lg:col-span-2 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+          <div class="mt-3 sm:mt-0 sm:ml-2">
+            <div class="flex flex-col mt-2 divide-y">
+              <ng-container>
+                <div class="flex flex-row items-center justify-between py-4 px-0.5">
+                  <div class="flex flex-col">
+                    <div class="font-medium">No tasks found</div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+
+</div>

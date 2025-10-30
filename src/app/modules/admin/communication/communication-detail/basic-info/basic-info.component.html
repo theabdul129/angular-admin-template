@@ -1,0 +1,41 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['admin/communication']"
+                        class="whitespace-nowrap text-primary-500">Communication</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Basic Details</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 *ngIf="communicationData"
+                    class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    {{communicationData.readOnlyServiceName}}
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-auto">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <mat-tab-group id="vertical-tabs" *ngIf="communicationData" fxFill>
+            <mat-tab *ngFor="let option of communicationData.communicationServiceBodies; index as index"
+                [label]="option.readOnlyMethodName">
+                <div>
+                    <app-form-service-body [serviceTemplate]="communicationData"
+                    [(selectedBodyService)]="communicationData.communicationServiceBodies[index]">
+                </app-form-service-body>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+</div>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Sign in | bsktpay</title>
+        <meta charset="utf-8">
+        <meta
+            name="viewport"
+            content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+
+        <base href="/">
+
+        <!-- Favicon -->
+        <link
+            rel="icon"
+            href="favicon.png"
+            type="image/ico">
+
+        <!-- Fonts -->
+        <link
+            href="assets/fonts/inter/inter.css"
+            rel="stylesheet">
+
+        <link
+            href="https://fonts.gstatic.com"
+            rel="preconnect">
+        <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+            rel="stylesheet">
+
+        <!-- Icon fonts -->
+        <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+            rel="stylesheet">
+
+        
+        <!-- Login screen styles -->
+        <link
+            href="assets/styles/login-screen.css"
+            rel="stylesheet">
+        <!-- Splash screen styles -->
+        <link
+            href="assets/styles/splash-screen.css"
+            rel="stylesheet">
+        <link 
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+        <script 
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    </head>
+
+    <body>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+   
+          // Dynamically set the src attribute
+          var dynamicScript = document.createElement('script');
+          //Google tag (gtag.js)
+   
+         dynamicScript.src = 'https://www.googletagmanager.com/gtag/js?id='+window['__env'].googleTagKey;
+   
+         // Append the script element to the head of the document
+         document.head.appendChild(dynamicScript);
+   
+         // Use the dynamic value as needed
+         console.log('Dynamic Value:', window['__env'].googleTagKey);
+   
+         window.dataLayer = window.dataLayer || [];
+           function gtag(){dataLayer.push(arguments);}
+           gtag('js', new Date());
+   
+           gtag('config', window['__env'].googleTagKey);
+               });
+     </script>
+        <!-- Splash screen -->
+        <fuse-splash-screen>
+            <img src="assets/images/logo/bsktpay_logo.png" alt="bsktpay logo" class="branding">
+            <div class="spinner">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div>
+        </fuse-splash-screen>
+
+        <!-- App root -->
+        <app-root></app-root>
+
+
+
+
+        <script 
+            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+ <!-- Use the environment variable in a script tag -->
+
+           
+    </body>
+
+</html>

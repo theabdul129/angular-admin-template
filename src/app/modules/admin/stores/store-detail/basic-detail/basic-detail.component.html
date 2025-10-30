@@ -1,0 +1,345 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/stores']" class="whitespace-nowrap text-primary-500">Stores</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Basic Details</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    Edit Store
+                </h2>
+            </div>
+            <div class="flex flex-auto mt-3 w-full">
+                <button mat-flat-button [color]="'warn'" (click)="openModal(archiveStoreModal)"
+                    class="mr-2 btn btn-danger">
+                    Archive
+                </button>
+                <button mat-flat-button [color]="'primary'" (click)="openModal(liveStoreModal)"
+                    *ngIf="!selectedStore?.approvedAt" class="mr-2 btn btn-success">
+                    Publish
+                </button>
+                <button mat-flat-button [color]="'warn'" (click)="openModal(hideStoreModal)"
+                    *ngIf="selectedStore?.approvedAt" class="mr-2 btn btn-danger">
+                    Unpublish
+                </button>
+                <button mat-flat-button [color]="'warn'" (click)="openModal(productionStoreModal)"
+                    *ngIf="selectedStore?.environment === 'sandbox'" class="mr-2 btn btn-danger">
+                    Production Mode
+                </button>
+                <button mat-flat-button [color]="'primary'" (click)="openModal(sandboxStoreModal)"
+                    *ngIf="selectedStore?.environment === 'production'" class="mr-2 btn btn-success ">
+                    Sandbox Mode
+                </button>
+            </div>
+        </div>
+        <button class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last" mat-icon-button (click)="toggleDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="flex-auto p-4">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <div class="flex">
+            <div class="flex-auto mr-4">
+                <div class="p-5 rounded-md shadow bg-card">
+                    <fuse-alert *ngIf="userForm.invalid && formSubmitted" class="my-3" [appearance]="'outline'"
+                        [type]="'warning'">
+                        Please fill in all the required fields.
+                    </fuse-alert>
+                    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+                        <div class="grid grid-cols-2 gap-4">
+                            <mat-form-field class="fuse-mat-no-subscript w-full">
+                                <mat-label>Name*</mat-label>
+                                <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                                    [svgIcon]="'heroicons_solid:user-circle'">
+                                </mat-icon>
+                                <input matInput formControlName="name" [placeholder]="'Name'" [spellcheck]="false">
+                            </mat-form-field>
+                            <mat-form-field class="fuse-mat-no-subscript w-full">
+                                <mat-label>Description</mat-label>
+                                <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                                    [svgIcon]="'heroicons_solid:menu-alt-2'">
+                                </mat-icon>
+                                <input matInput formControlName="description" [placeholder]="'Description'">
+                            </mat-form-field>
+                        </div>
+                        <div class="grid grid-cols-2 mt-8 gap-4">
+                            <mat-form-field class="fuse-mat-no-subscript w-full">
+                                <mat-label>Website</mat-label>
+                                <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                                    [svgIcon]="'heroicons_solid:globe'">
+                                </mat-icon>
+                                <input matInput [formControlName]="'website'" [placeholder]="'Website'"
+                                    [spellcheck]="false">
+                            </mat-form-field>
+
+                        </div>
+                        <!-- <div class="grid grid-cols-2 gap-4 mt-8">
+                            <mat-form-field class="fuse-mat-no-subscript w-full">
+                                <mat-label>WebHook URL</mat-label>
+                                <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                                    [svgIcon]="'heroicons_solid:globe'">
+                                </mat-icon>
+                                <input matInput formControlName="webHookUrl" [placeholder]="'WebHook URL'"
+                                    [spellcheck]="false">
+                            </mat-form-field>
+                        </div> -->
+                        <div class="my-8">
+                            <div class="mb-2">Order Accept Method*</div>
+                            <mat-radio-group formControlName="acceptOrderMethod">
+                                <mat-radio-button value="autoAccept">Order automatically accepted</mat-radio-button>
+                                <mat-radio-button class="mx-4" value="acceptTimeToCancel">Time to decline
+                                </mat-radio-button>
+                                <mat-radio-button value="waitForAccept">Time to accept</mat-radio-button>
+                            </mat-radio-group>
+                        </div>
+                        <mat-accordion multi>
+                            <mat-expansion-panel [expanded]="'true'">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        <div class="text-1xl font-extrabold tracking-tight">Store Address</div>
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-save-address *ngIf="(isLoadingObs | async) !== true"
+                                    [address]="userForm.get('storeAddress')"></app-save-address>
+                            </mat-expansion-panel>
+                            <!-- <mat-expansion-panel>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        <div class="text-1xl font-extrabold tracking-tight">Registered Address</div>
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <app-save-address *ngIf="(isLoadingObs | async) !== true"
+                                    [address]="userForm.get('registeredAddress')"></app-save-address>
+                            </mat-expansion-panel> -->
+                        </mat-accordion>
+                        <div class="flex items-center justify-center mt-10 -mx-6 py-4 pr-4 pl-1">
+                            <button class="ml-auto" mat-button [matTooltip]="'Cancel'"
+                                [routerLink]="['/']">
+                                Cancel
+                            </button>
+                            <button [disabled]="isLoadingObs | async" class="ml-2" mat-flat-button [color]="'primary'">
+                                {{selectedStoreId ? 'Update' : 'Save'}}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="flex-none w-64">
+                <div class="p-5 rounded-md shadow bg-card" *ngIf="selectedStore">
+                    <account-info [data]="selectedStore?.businessAccount" [link]="'/admin/business-account/edit'" [title]="'Business Account'"></account-info>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #archiveStoreModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Archive: {{ selectedStore.name }}</h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to archive
+            <strong>{{ selectedStore.name }} </strong>? You will NOT be able to use
+            this store again for any subsequent bookings or make any changes? It
+            will be disabled from all interaction
+        </p>
+    </div>
+    <div class="modal-footer mt-4">
+        <button mat-raised-button [color]="'basic'" (click)="closeModal()" class="btn btn-outline-secondary"
+            type="button">
+            Cancel
+        </button>
+        <button [disabled]="isLoadingObs | async" (click)="archiveStore()" class="ml-2 btn btn-danger" type="button"
+            mat-raised-button [color]="'primary'">
+            Archive
+        </button>
+
+        <button *ngIf="isLoadingObs | async" class="ml-2 btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #liveStoreModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Go live: {{ selectedStore.name }}</h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to out this store live
+            <strong>{{ selectedStore.name }} </strong>? This store will be available
+            to purchase!
+        </p>
+    </div>
+    <div class="modal-footer mt-4">
+        <button mat-raised-button [color]="'basic'" (click)="closeModal()" class="btn btn-outline-secondary"
+            type="button">
+            Cancel
+        </button>
+        <button [disabled]="isLoadingObs | async" (click)="liveStore()" class="ml-2 btn btn-danger" type="button"
+            mat-raised-button [color]="'primary'">
+            LIVE
+        </button>
+        <button *ngIf="isLoadingObs | async" class="ml-2 btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #hideStoreModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Hide: {{ selectedStore.name }}</h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to out hide this store
+            <strong>{{ selectedStore.name }} </strong>? This store will be NOT
+            available to purchase!
+        </p>
+    </div>
+    <div class="modal-footer mt-4">
+        <button mat-raised-button [color]="'basic'" (click)="closeModal()" class="btn btn-outline-secondary"
+            type="button">
+            Cancel
+        </button>
+        <button [disabled]="isLoadingObs | async" (click)="hideStore()" class="ml-2 btn btn-danger" type="button"
+            mat-raised-button [color]="'primary'">
+            HIDE
+        </button>
+        <button *ngIf="isLoadingObs | async" class="ml-2 btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #sandboxStoreModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Hide: {{ selectedStore.name }}</h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to put
+            <strong>{{ selectedStore.name }} </strong> in sandbox mode? You will not
+            receive orders!
+        </p>
+    </div>
+    <div class="modal-footer mt-4">
+        <button mat-raised-button [color]="'basic'" (click)="closeModal()" class="btn btn-outline-secondary"
+            type="button">
+            Cancel
+        </button>
+        <button [disabled]="isLoadingObs | async" (click)="changeEnvironment('sandbox')" class="btn btn-danger"
+            type="button" mat-raised-button [color]="'primary'">
+            Sandbox
+        </button>
+        <button *ngIf="isLoadingObs | async" class="ml-2 btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #productionStoreModal let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">Production mode: {{ selectedStore.name }}</h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            Are you sure you want to take
+            <strong>{{ selectedStore.name }} </strong> out of sandbox mode? You will
+            begin to receive orders!
+        </p>
+    </div>
+    <div class="modal-footer mt-4">
+        <button mat-raised-button [color]="'basic'" (click)="closeModal()" class="btn btn-outline-secondary"
+            type="button">
+            Cancel
+        </button>
+        <button [disabled]="isLoadingObs | async" (click)="changeEnvironment('production')" class="ml-2 btn btn-danger"
+            type="button" mat-raised-button [color]="'primary'">
+            Production
+        </button>
+        <button *ngIf="isLoadingObs | async" class="btn btn-danger" disabled type="button">
+            <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+            Please wait...
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #contactUserModal let-modal>
+    <form (ngSubmit)="onContactUserSubmit()" [formGroup]="contactUserForm">
+
+        <div class="modal-header">
+            <h4 class="mat-dialog-title">Contact: {{store.name }} </h4>
+            <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+
+            <mat-form-field class="mt-4 fuse-mat-no-subscript w-full">
+                <mat-label>Method*</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:support'">
+                </mat-icon>
+                <mat-select matInput formControlName="contactMethod">
+                    <mat-option value="sms">SMS</mat-option>
+                    <mat-option value="push">Push</mat-option>
+                    <mat-option value="email">Email</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="mt-4 fuse-mat-no-subscript w-full">
+                <mat-label>Message Subject*</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:cog'"></mat-icon>
+                <input matInput [formControlName]="'subject'" [placeholder]="'Subject'">
+            </mat-form-field>
+
+            <mat-form-field class="mt-4 fuse-mat-no-subscript w-full">
+                <mat-label>Message Body*</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+                </mat-icon>
+                <textarea matInput [formControlName]="'body'" [placeholder]="'Message Body'"></textarea>
+            </mat-form-field>
+        </div>
+        <div class="modal-footer mt-8">
+            <button mat-raised-button [color]="'primary'" class="btn btn-outline-primary" type="submit">Contact</button>
+            <button mat-raised-button [color]="'primary'" *ngIf="isLoadingObs | async" class="btn btn-danger" disabled
+                type="button">
+                <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+                Please wait...
+            </button>
+        </div>
+    </form>
+</ng-template>

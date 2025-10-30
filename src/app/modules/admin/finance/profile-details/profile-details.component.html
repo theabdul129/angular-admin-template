@@ -1,0 +1,88 @@
+<div  class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto lock">
+    <div class="mt-4 sm:mt-4">
+        <div class="text-xl font-bold tracking-tight my-3">
+            Basic Information
+        </div>
+        <div class="flex flex-auto ">
+            <div class="flex flex-col h-86 overflow-hidden col-5">
+                <mat-list>
+                    <mat-list-item class=" border-t-2 tracking-tighter text-lg"><label
+                            class="w-36 opacity-50 ">Legal name</label>
+                        <span>{{profile?.merchantAccount?.legalName}}</span>
+                    </mat-list-item>
+                    <mat-list-item class="border-t-2 tracking-tighter text-lg"><label
+                            class="w-36 opacity-50 ">Email</label><span>{{profile?.merchantAccount?.supportEmail}}</span>
+                    </mat-list-item>
+                    <mat-list-item class=" border-t-2 tracking-tighter text-lg"><label
+                            class="w-36 opacity-50 ">Currency</label>
+                        <span>{{profile?.merchantAccount?.currency}}</span>
+                    </mat-list-item>
+                    <mat-list-item class=" border-t-2 tracking-tighter text-lg"><label
+                            class="w-36 opacity-50 ">TaxNumber</label>
+                        <span>{{profile?.merchantAccount?.taxNumber}}</span>
+                    </mat-list-item>
+                    <mat-list-item class=" border-t-2 tracking-tighter text-lg"><label
+                            class="w-36 opacity-50 ">Company Number</label>
+                        <span>{{profile?.merchantAccount?.companyNumber}}</span>
+                    </mat-list-item>
+                    <mat-list-item class="border-t-2 tracking-tighter text-lg"><label
+                            class="w-36 opacity-50 ">Website</label>
+                        <span>{{profile?.merchantAccount?.website}}</span>
+                    </mat-list-item>
+                    <mat-list-item class="border-t-2 tracking-tighter text-lg"><label
+                            class="w-36 opacity-50 ">ID
+                            Number</label><span>{{profile?.merchantAccount?.accountNumber}}</span>
+                    </mat-list-item>
+                    <mat-list-item class="border-t-2 tracking-tighter text-lg"><label
+                            class="w-36 opacity-50 ">Street
+                            Address</label><span>{{profile?.merchantAccount?.registeredAddress?.address1}}
+                            {{profile?.merchantAccount?.registeredAddress?.address2}}
+                            {{profile?.merchantAccount?.registeredAddress?.address3}} </span>
+                    </mat-list-item>
+
+                    <mat-list-item class="border-t-2 tracking-tighter text-lg"><label
+                            class="w-36 opacity-50 ">Country</label>
+                        <span>{{profile?.merchantAccount?.registeredAddress?.countryCode}}</span>
+                    </mat-list-item>
+
+                    <mat-list-item class="border-t-2 tracking-tighter text-lg"><label
+                            class="w-36 opacity-50 ">Routing</label>
+                        <span id="mat-select">
+                            <mat-select
+                            placeholder="Routing" [(ngModel)]="beneficiaryOrder"
+                            >              
+                              <mat-option value="1">
+                                First string
+                              </mat-option>
+                              <mat-option value="2">
+                                Second string
+                              </mat-option>
+                              <mat-option value="3">
+                                Third string
+                              </mat-option>
+                              <mat-option value="null">
+                                Smart Routing
+                              </mat-option>
+                            </mat-select>
+                        </span>
+                    </mat-list-item>
+                    
+                    <mat-list-item class="border-t-2 tracking-tighter text-lg">
+                        <section class="example-section flex">
+                            <mat-checkbox class="example-margin" [(ngModel)]="lenderEnabled">Lender Enabled </mat-checkbox>
+                        </section>
+                    </mat-list-item>
+                    <mat-list-item class="border-t-2 tracking-tighter text-lg text-right">
+                        <button type="button" mat-flat-button [color]="'primary'" (click)="saveRouting()">
+                            <span class="ml-2 mr-1"> Save</span>
+                          </button>
+                    </mat-list-item>
+
+                </mat-list>
+            </div>
+          
+        </div>
+       
+    </div>
+
+</div>

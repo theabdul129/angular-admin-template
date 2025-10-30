@@ -1,0 +1,62 @@
+/* Apply hover effect to .hover, excluding .image, img, and p */
+.hover:hover:not(.image):not(img):not(p) {
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  /* Reset hover effect on inner elements */
+  .hover > .descr:hover,
+  .hover > .image:hover,
+  .hover > p:hover {
+    box-shadow: none; /* Reset the box-shadow on specific inner elements */
+  }
+
+._card{
+    display: flex;
+    word-wrap: break-word;
+    background-color: white;
+    align-items: center;
+    border-radius: 10px;
+    margin-top: 12px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 10px;
+    .image{
+        width: 30px;
+        height: 30px;
+        margin: auto;
+        img{
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    }
+
+}
+
+.image{
+    width: 30px;
+    height: 30px;
+    margin: auto;
+    img{
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
+
+// .hover :hover:not(.image,img,p){
+//     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+// }
+
+// .image{
+//     width: 80px;
+//     height: 80px;
+//     margin: auto;
+//     img{
+//         width: 100%;
+//         height: 100%;
+//         object-fit: contain;
+//     }
+// }

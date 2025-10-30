@@ -1,0 +1,120 @@
+<div class="flex flex-auto justify-content-center12 align-items-center12">
+    <div class="col-12 col-md-6 col-lg-6 bg-white">
+        <div class="pad flex align-items-start flex-column" style="height: 100%;">
+
+            <div class="">
+                <img src="assets/images/logo/bsktpay_logo.png" alt="bsktpay logo" class="branding">
+            </div>
+            <div class="py-5">
+                <h1 class="display-6 tracking-tight leading-tight pb-2">Sign up</h1>
+                <p class="lead tracking-tight leading-tight">Already have an account?<a
+                    class="ml-1 text-primary-500 hover:underline"
+                    [routerLink]="['/sign-in']">Sign in
+                </a></p>  
+            </div>
+
+            <fuse-alert
+                class="mt-8"
+                *ngIf="showAlert"
+                [appearance]="'outline'"
+                [showIcon]="false"
+                [type]="alert.type"
+                [@shake]="alert.type === 'error'">
+                {{alert.message}}
+            </fuse-alert>
+
+            <form class="form mt-8 w-full" [formGroup]="formGroup">
+                <div class="grid grid-cols-1 sm:grid-cols-1 gap-x-3">
+                
+                    <mat-form-field class="w-full">
+                        <mat-label>Company</mat-label>
+                        <input id="company-confirm" matInput [formControlName]="'company'">
+                        <mat-error class="text-lg" *ngIf="formGroup.get('company').hasError('required')">
+                            Company is required
+                        </mat-error>
+                    </mat-form-field>
+    
+                    <mat-form-field class="w-full">
+                        <mat-label>First name</mat-label>
+                        <input id="firstName" matInput [formControlName]="'firstName'">
+                        <mat-error class="text-lg" *ngIf="formGroup.get('firstName').hasError('required')">
+                            First name is required
+                        </mat-error>
+                    </mat-form-field>
+    
+                    <mat-form-field class="w-full">
+                        <mat-label>Surname</mat-label>
+                        <input id="surname" matInput [formControlName]="'surname'">
+                        <mat-error  class="text-lg" *ngIf="formGroup.get('surname').hasError('required')">
+                            Surname is required
+                        </mat-error>
+                    </mat-form-field>
+    
+                    <mat-form-field class="w-full">
+                        <mat-label>Email address</mat-label>
+                        <input inputmode="email" id="emailAddress" matInput [formControlName]="'email'">
+                        <mat-error class="text-lg" *ngIf="formGroup.get('email').hasError('required')">
+                            Email address is required
+                        </mat-error>
+                        <mat-error class="text-lg" *ngIf="formGroup.get('email').hasError('email')">
+                            Please enter a valid email address
+                        </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="w-full" appearance="fill">
+                        <mat-label>Password</mat-label>
+                        <input id="password" matInput type="password" [formControlName]="'password'" #passwordField>
+                        <button mat-icon-button type="button"
+                            (click)="passwordField.type === 'password' ? passwordField.type = 'text' : passwordField.type = 'password'"
+                            matSuffix>
+                            <mat-icon class="icon-size-5" *ngIf="passwordField.type === 'password'"
+                                [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                            <mat-icon class="icon-size-5" *ngIf="passwordField.type === 'text'"
+                                [svgIcon]="'heroicons_solid:eye-slash'"></mat-icon>
+                        </button>
+                        <mat-error *ngIf="formGroup.get('password').errors && formGroup.get('password').touched">
+                            <span class="text-lg" *ngIf="formGroup.get('password').errors['required']">Password is required.</span>
+                            <span class="text-lg" *ngIf="formGroup.get('password').errors['passwordStrength']">Password must be at least 8
+                                characters long, include uppercase and lowercase letters, a number, and a special
+                                character.</span>
+                            <span class="text-lg"
+                                *ngIf="formGroup.get('password').errors['passwordStrength'] && formGroup.get('password').value.includes(commonWords.join(','))">Password
+                                contains common words or names, please choose a more complex password.</span>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+
+
+                <div class="inline-flex items-end w-full mt-1.5">
+                    <mat-checkbox class="-ml-2" [color]="'primary'" [formControlName]="'agreements'">
+                        <span class="text-xl">I agree with</span>
+                        <a class="ml-1 text-primary-500 hover:underline text-xl" href="https://www.bsktpay.co/terms-and-conditions" target="_blank">Terms
+                        </a>
+                        <span class="text-xl">and</span>
+                        <a class="ml-1 text-primary-500 hover:underline text-xl" href="https://www.bsktpay.co/privacy-policy" target="_blank">Privacy Policy
+                        </a>
+                    </mat-checkbox>
+                </div>
+
+
+                <div class="py-2">
+                    <button class="btn btn-primary rounded-0" [disabled]="formGroup.disabled" (click)="onSubmit()">
+                        <span *ngIf="!formGroup.disabled">
+                            Let's get started
+                        </span>
+
+                        <mat-progress-spinner *ngIf="formGroup.disabled" [diameter]="24"
+                            [mode]="'indeterminate'"></mat-progress-spinner>
+                    </button>
+                </div>
+
+
+
+            </form>
+
+        </div>
+    </div>
+    <div class="d-none postion_ d-sm-block col-md-6 col-lg-6">
+        <img src="assets/images/login/login.jpg" alt="login image" class="login-img">
+    </div>
+</div>

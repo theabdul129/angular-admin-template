@@ -1,0 +1,42 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card ">
+    <div class="bg-card"  *ngIf="lenderData">
+        <div class="flex flex-col w-full max-w-screen-xl mx-auto px-6 sm:px-8">
+            <div class="flex flex-col sm:flex-row flex-auto sm:items-center min-w-0 my-4 sm:my-6 ">
+                <div class="flex flex-auto items-center min-w-0">
+                    <div class="flex flex-col min-w-0 ml-4">
+                        <div class="flex items-center">
+                            <div
+                                class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate ng-star-inserted">
+                                {{lenderData?.merchantAccount?.legalName}}
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="flex items-center justify-between">
+                              
+                                <span class="ms-2">Updated   {{lenderData?.updatedAt | date: 'MMM dd, yy, hh:mm a'}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center mt-6 sm:mt-0 sm:ml-2 space-x-3" role="button" [routerLink]="['/admin/finance']">
+                    <mat-icon svgIcon="close"></mat-icon>
+                </div>
+            </div>
+
+        </div>
+        <div class="flex flex-col w-full max-w-screen-xl mx-auto my-3">
+            <mat-tab-group mat-align-tabs="start" [selectedIndex]="activeTab" class="flex w-full p-2 max-w-screen-xl">
+                <mat-tab label="Profile">
+                    <app-profile-details [id]="lenderData?.id"></app-profile-details>
+                </mat-tab>
+                
+                <mat-tab label="Payments">
+                    <app-payment-details [id]="lenderData?.id"></app-payment-details>
+                </mat-tab>
+                <mat-tab label="Applications"> 
+                    <app-applications></app-applications>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </div>
+</div>

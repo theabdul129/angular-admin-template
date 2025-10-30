@@ -1,0 +1,43 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-4 sm:mt-4">
+
+    <span *ngFor="let applicants of userData">
+      <div class="flex flex-col h-86 overflow-hidden">
+        <div class="text-lg font-bold tracking-tight">
+          <a class="cursor-pointer" [routerLink]="['/borrowers/details/' + applicants?.userDetail?.accountNumber]">Borrower: {{ applicants?.userDetail?.firstName }} {{ applicants?.userDetail?.surname }}</a>
+    
+      </div>
+  
+        <mat-list>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm"
+            ><label class="w-32 opacity-50 font-bold">Email</label>
+            <span>{{ applicants.userDetail.emailAddress || "N/A" }}</span>
+          </mat-list-item>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm"
+            ><label class="w-32 opacity-50 font-bold">Phone</label><span>{{ applicants?.userDetail?.primaryPhone || "N/A" }}</span>
+          </mat-list-item>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm"
+            ><label class="w-32 opacity-50 font-bold">ID Number</label><span>{{ applicants?.userDetail?.id || "N/A" }}</span>
+          </mat-list-item>
+          <mat-list-item class="border-b-2 tracking-tighter text-sm"
+            ><label class="w-32 opacity-50 font-bold">Date of Birth</label><span>{{ (applicants?.userDetail?.dateOfBirth | date ) || "N/A" }}</span></mat-list-item
+          >
+          <mat-list-item class="border-b-2 tracking-tighter text-sm"
+            ><label class="w-32 opacity-50 font-bold">Address</label><span>{{ applicants?.userDetail?.homeAddress?.address1 }} {{ applicants?.userDetail?.homeAddress?.address2 }} {{ applicants?.userDetail?.homeAddress?.address3 }} {{ applicants?.userDetail?.homeAddress?.postcode }}</span></mat-list-item
+          >
+  
+        </mat-list>
+        <div class="flex align-center signature ml-3">
+          <label class="w-32 opacity-50 font-bold">Signature</label>
+  
+          <div class="image_date-wrape">
+            <div *ngIf="signatureImage" class="image_wrape"> 
+              <img  [src]="signatureImage" alt="sign image" > 
+            </div>
+            <span class="pt-2 text-xs">Signed: <b>{{ document?.createdAt|date }}</b></span>
+          </div>
+          <span *ngIf="!signatureImage">N/A</span>
+        </div>
+      </div>
+    </span>
+  </div>
+  

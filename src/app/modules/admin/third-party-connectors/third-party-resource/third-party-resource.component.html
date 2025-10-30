@@ -1,0 +1,136 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+    class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+    <div class="flex-1 min-w-0">
+        <!-- Breadcrumbs -->
+      
+        <!-- Title -->
+        <div class="mt-2">
+            <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                {{pageTitle}}
+            </h2>
+        </div>
+    </div>
+   
+</div>
+
+  <div class="flex-auto p-6 sm:p-10">
+      <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+      <form [formGroup]="thirdPartyForm" *ngIf="connector!=='google-drive' && connector!=='Fb-Google-Ad'">
+        <div class="my-2" *ngIf="connector=='google-analytics' || connector=='google-sheet'">
+            <app-file-uploader (selected)="selectedFileEvent($event)"></app-file-uploader>
+        </div>
+          <div class="my-2">
+            <mat-form-field class="fuse-mat-no-subscript w-full">
+                <mat-label *ngIf="connector=='google-sheet'">Spreadsheet Id</mat-label>
+                <mat-label *ngIf="connector=='mail-chimp' || connector=='google-analytics'">Key</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                <input matInput [formControlName]="'id'" [placeholder]="'key'" [spellcheck]="false">
+              </mat-form-field>
+          </div>
+          <div class="text-right">
+            <button class="ml-auto mt-5" mat-button [matTooltip]="'Cancel'" (click)="cancel()">
+                Cancel
+            </button>
+            <button button mat-flat-button [color]="'primary'" class="mt-5 btn btn-primary" type="button" (click)="onSubmit()">Connect</button>
+          </div>
+      </form>
+
+      <!-- google-drive form -->
+      <div class="google_driev" *ngIf="connector =='google-drive'">
+        <form class="form" [formGroup]="googleDriveForm">
+          <div class="my-2">
+                <div style="font-size: 1.02rem !important;font-weight: 400;">Google drive credentials</div>
+              <app-file-uploader (selected)="selectedFileEvent($event)"></app-file-uploader>
+          </div>
+          <br/>
+            <div class="my-2">
+              <div class="grid grid-cols-2 gap-1">
+                  <mat-form-field class="fuse-mat-no-subscript text-white w-full col-span-2">
+                      <mat-label>Google drive folder Url</mat-label>
+                      <input matInput [formControlName]="'folder_url'" [placeholder]="'Folder Url'"
+                          [spellcheck]="false">
+                  </mat-form-field>
+              </div>
+              
+              <!-- <mat-form-field class="fuse-mat-no-subscript text-white w-full mt-5">
+                <mat-label>Technology provider</mat-label>
+                <mat-select matInput [formControlName]="'tech_provider'">
+                    <mat-option *ngFor="let item of technologyProviders"
+                        [value]="item">{{item}}</mat-option>
+                </mat-select>
+            </mat-form-field> -->
+            </div>
+        </form>
+        
+        <div class="text-right">
+          <button class="ml-auto mt-5" mat-button [matTooltip]="'Cancel'" (click)="cancel()">
+              Cancel
+          </button>
+          <button button mat-flat-button [color]="'primary'" class="mt-5 btn btn-primary" type="button" (click)="gotMappingFields?connectGoogleDrive():onSubmit()">{{gotMappingFields==true?'Connect':"Next"}}</button>
+        </div>
+
+      </div>
+
+      <!-- Fb-Google-Ad form -->
+      <form class="form" [formGroup]="FBAdsForm" *ngIf="connector =='Fb-Google-Ad'">
+          <div class="my-2">
+            <div class="grid grid-cols-1 gap-1">
+                <mat-form-field class="fuse-mat-no-subscript text-white w-full col-span-2">
+                    <mat-label>Account Id</mat-label>
+                    <input matInput [formControlName]="'account_id'" [placeholder]="'Account Id'"
+                        [spellcheck]="false">
+                </mat-form-field>
+               
+                <mat-form-field class="fuse-mat-no-subscript text-white w-full col-span-2 mt-3">
+                    <mat-label>Access Token</mat-label>
+                    <input matInput [formControlName]="'access_token'" [placeholder]="'Access Token'"
+                        [spellcheck]="false">
+                </mat-form-field>
+            </div>
+          </div>
+          <div class="text-right">
+            <button class="ml-auto mt-5" mat-button [matTooltip]="'Cancel'" (click)="cancel()">
+                Cancel
+            </button>
+            <button button mat-flat-button [color]="'primary'" class="mt-5 btn btn-primary" type="button" (click)="onSubmit()">Connect</button>
+          </div>
+      </form>
+
+  </div>
+</div>
+
+
+<ng-template #CSVFields let-modal>
+  <div class="modal-header">
+      <h2 class="mat-dialog-title text-2xl"> Map data source for CSV</h2>
+  </div>
+  <mat-dialog-content>
+    <div class="google_drive_mapping mt-5" *ngIf="gotMappingFields && mappingObject?.required_fields?.length>0">
+      <div *ngFor="let field of mappingObject?.required_fields">
+        <mat-form-field class="fuse-mat-no-subscript w-full">
+          <mat-label>{{ removeUnderScore(field) | titlecase }}*</mat-label>
+          <mat-select matInput (selectionChange)="updateRequiredField($event, field)">
+              <mat-option *ngFor="let option of mappingObject?.current_fields; let i = index"
+                  [value]="option" [selected]="i === 0"> {{option}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="text-right">
+        <button button mat-flat-button [color]="'primary'" class="mt-5 btn btn-primary" type="button" (click)="connectGoogleDrive()">Connect</button>
+      </div>
+    </div>
+    
+    <div class="google_drive_mapping mt-5" *ngIf="gotMappingFields && mappingObject?.required_fields?.length<1">
+      <div class="text-lg text-center text">
+        There is no need of additional mapping. 
+        <p class="text-center font-semibold">Ready to connect</p>
+      </div>
+      <div class="text-right">
+        <button button mat-flat-button [color]="'primary'" class="mt-5 btn btn-primary" type="button" (click)="connectGoogleDrive()">Connect</button>
+      </div>
+    </div>
+  </mat-dialog-content>
+</ng-template>

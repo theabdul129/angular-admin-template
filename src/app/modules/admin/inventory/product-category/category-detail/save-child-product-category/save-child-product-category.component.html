@@ -1,0 +1,27 @@
+
+<fuse-alert *ngIf="productCategoryForm.invalid && formSubmitted" class="my-3" [appearance]="'outline'"
+[type]="'warning'">
+Please fill in all the required fields.
+</fuse-alert>
+<form [formGroup]="productCategoryForm">
+
+  <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+    <mat-label>Name*</mat-label>
+    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+    </mat-icon>
+    <input matInput [formControlName]="'name'" [placeholder]="'Name'" />
+  </mat-form-field>
+
+  <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full my-4">
+    <mat-label>Description</mat-label>
+    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+    </mat-icon>
+    <textarea matInput [formControlName]="'description'" [placeholder]="'Description'"></textarea>
+  </mat-form-field>
+
+  <div class="modal-footer">
+    <button mat-flat-button [color]="'warn'" (click)="onArchive()" *ngIf="productCategory" class="btn btn-warning mr-3"
+      type="button">Archive</button>
+    <button mat-flat-button [color]="'primary'" (click)="onSubmit()" class="btn btn-primary" type="button">Save</button>
+  </div>
+</form>

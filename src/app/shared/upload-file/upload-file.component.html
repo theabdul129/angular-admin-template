@@ -1,0 +1,17 @@
+<div class="uploadfilecontainer" (click)="fileInput.click()" appDragDrop (onFileDropped)="uploadFile($event)">
+  <input hidden type="file" #fileInput (change)="uploadFile($event.target.files)">
+</div>
+<div class="files-list" *ngFor="let file of files;let i=index">
+  <p>{{ file.name }}</p>
+  <div class="progress form-group" *ngIf="progress[i] > 0">
+    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" [style.width.%]="progress[i]">
+    </div>
+  </div>
+  <button mat-flat-button [color]="'danger'" type="button" class="delete-file" (click)="deleteAttachment(i)">
+    Delete
+  </button>
+</div>
+
+<div class="row text-center">
+  <button mat-flat-button [color]="'primary'" type="button" (click)="uploadFiles()">Upload</button>
+</div>

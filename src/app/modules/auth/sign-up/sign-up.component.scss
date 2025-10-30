@@ -1,0 +1,65 @@
+.mat-stepper-horizontal {
+    margin-top: 16px;
+  }
+  ::ng-deep .mat-horizontal-stepper-content[aria-expanded="false"] {
+    width: 750px !important;
+
+  }
+
+  ::ng-deep .country-dropdown {
+    border: 1px solid #ccc;
+    width: -webkit-fit-content;
+    padding: 1px;
+    border-collapse: collapse;
+    // border: 1px solid;
+    // width: 100% !important;
+}
+
+::ng-deep .mat-horizontal-content-container {
+  overflow: visible !important;
+  padding: 0 24px 24px 24px;
+}
+
+::ng-deep .dropdown-menu[_ngcontent-itg-c286] {
+  position: sticky !important;
+}
+
+
+@media screen and (min-width: 960px) and (max-width: 1440px) {
+  .page_width{
+    width: 40% !important;
+  }
+}
+
+@media screen and (min-width: 1440px) {
+  .page_width{
+    width: 33.33%  !important;
+  }
+}
+.pad {
+  padding: 40px 34px 30px !important;
+}
+
+@media (min-width: 992px){
+  .pad {
+      padding: 40px 34px 30px !important;
+  }
+}
+
+.mat-mdc-form-field-error-wrapper {
+  position: relative !important;
+  padding: 0 16px;
+  margin-top:-18px
+}
+
+.btn{
+  background-color: #1FAA9F!important;
+  border-color: #1FAA9F!important;
+  padding: 0.8rem 3.5rem!important;
+  font-size: 1.2rem!important;
+}
+
+.postion_{
+  position: fixed;
+  right: 0;
+}

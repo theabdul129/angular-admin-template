@@ -1,0 +1,76 @@
+<h4 class="text-2xl font-extrabold mt-0 capitalize">{{ selectedBodyService.readOnlyMethodName }}</h4>
+<mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+<form [formGroup]="userForm">
+  <mat-form-field class="fuse-mat-no-subscript w-full">
+    <mat-label>Description</mat-label>
+    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+    </mat-icon>
+    <textarea matInput [formControlName]="'description'" [placeholder]="'description'" [spellcheck]="false"></textarea>
+  </mat-form-field>
+
+  <fuse-alert class="my-4" [appearance]="'outline'" [type]="'primary'">
+    <span fuseAlertTitle>Available fields</span>
+    {{selectedBodyService.availableFields}}
+  </fuse-alert>
+
+  <p class="text-1xl font-extrabold my-3">Usages $UserDetail.firstName$</p>
+
+  <mat-form-field class="fuse-mat-no-subscript w-full my-3">
+    <mat-label>Subject</mat-label>
+    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+    </mat-icon>
+    <input matInput [formControlName]="'subject'" [placeholder]="'subject'" [spellcheck]="false">
+  </mat-form-field>
+
+  <mat-form-field class="fuse-mat-no-subscript w-full">
+    <mat-label>Text Body</mat-label>
+    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+    </mat-icon>
+    <textarea matInput [formControlName]="'textBody'" [placeholder]="'textBody'" [spellcheck]="false"></textarea>
+  </mat-form-field>
+
+  <div class="position-relative form-group my-3">
+    <label for="htmlBody">Html Body</label>
+
+    <ckeditor
+    [editorUrl]="'https://cdn.ckeditor.com/4.11.4/full-all/ckeditor.js'"
+
+      [config]="{ 
+        resize_enabled:true,  
+        height : 150,  
+        fullPage: true, 
+        allowedContent: true,
+        toolbar : [
+                    { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
+                    { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+                    { name: 'editing', groups: [ 'find', 'selection', 'spellchecker' ], items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+                    { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+                    '/',
+                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'CopyFormatting', 'RemoveFormat' ] },
+                    { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language' ] },
+                    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                    { name: 'insert', items: [ 'Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe' ] },
+                    '/',
+                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+                    { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+                    { name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] },
+                    { name: 'others', items: [ '-' ] },
+                    { name: 'about', items: [ 'About' ] }
+                  ]
+
+      }"
+      tagName="textarea"
+      [(ngModel)]="model.editorData"
+      [ngModelOptions]="{ standalone: true }"
+    ></ckeditor>
+  </div>
+
+  <mat-form-field class="fuse-mat-no-subscript w-full">
+    <mat-label>Footer</mat-label>
+    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+    </mat-icon>
+    <textarea matInput [formControlName]="'footer'" [placeholder]="'footer'" [spellcheck]="false"></textarea>
+  </mat-form-field>
+
+  <button mat-raised-button [color]="'primary'" class="mt-3" (click)="onSubmit()">Save</button>
+</form>

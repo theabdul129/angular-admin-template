@@ -1,0 +1,20 @@
+<div class="flex flex-col flex-auto"> 
+    <div class="font-medium text-secondary">New vs. Closed</div>
+    <div class="flex flex-col flex-auto" *ngIf="chartGithubIssues"> 
+        <apx-chart
+            class="flex-auto w-full h-80"
+            [chart]="chartGithubIssues?.chart"
+            [colors]="chartGithubIssues?.colors"
+            [dataLabels]="chartGithubIssues?.dataLabels"
+            [grid]="chartGithubIssues?.grid"
+            [labels]="chartGithubIssues?.labels"
+            [legend]="chartGithubIssues?.legend"
+            [plotOptions]="chartGithubIssues?.plotOptions"
+            [series]="chartGithubIssues?.series"
+            [states]="chartGithubIssues?.states"
+            [stroke]="chartGithubIssues?.stroke"
+            [tooltip]="chartGithubIssues?.tooltip"
+            [xaxis]="chartGithubIssues?.xaxis"
+            [yaxis]="chartGithubIssues?.yaxis"></apx-chart>
+    </div>
+</div>

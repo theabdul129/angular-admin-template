@@ -1,0 +1,7 @@
+.mat-mdc-row:hover {
+    cursor: pointer;
+}
+
+.mat-mdc-table .mdc-data-table__row:not(.mdc-data-table__row--selected):hover {
+    background: #e0e0e0!important;
+}

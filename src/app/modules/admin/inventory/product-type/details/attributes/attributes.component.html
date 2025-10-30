@@ -1,0 +1,116 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/products-types']" class="whitespace-nowrap text-primary-500">Product
+                        Types</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Attributes</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-3xl mb-3 md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    Attributes
+                </h2>
+                <button mat-flat-button [color]="'primary'" (click)="openType(type, null)">
+                    <mat-icon [svgIcon]="'heroicons_solid:plus'"></mat-icon>
+                    <span class="ml-2">Add New</span>
+                </button>
+            </div>
+        </div>
+        <button class="-ml-3 sm:ml-0 mb-2 sm:mb-0 order-first sm:order-last" mat-icon-button (click)="toggleDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:menu'"></mat-icon>
+        </button>
+    </div>
+
+    <div class="flex-auto">
+        <table class="w-full bg-white" mat-table matSort [dataSource]="dataSource">
+            <ng-container matColumnDef="sr">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                    ID
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span class="pr-6 whitespace-nowrap">
+                        {{element.id}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                    Name
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span class="pr-6 whitespace-nowrap">
+                        {{element.name | titlecase}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="type">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                    Type
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <span class="pr-6 whitespace-nowrap">
+                        {{element.type | titlecase}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>
+                    Description
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.description}}
+                </td>
+            </ng-container>
+
+            <tr class="bg-white shadow" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr class="order-row h-16" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <fuse-alert class="mt-4" *ngIf="errorMsg || (dataSource && dataSource.length ==0) || (totalAccounts == 0)" [appearance]="'outline'"
+            [type]="'warning'">
+            {{errorMsg ? errorMsg : 'No records found'}}
+        </fuse-alert>
+    </div>
+</div>
+
+<ng-template #type let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title">
+            Attribute Detail
+        </h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div>
+            <div class="grid grid-cols-1 gap-4">
+                <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                    <mat-label>Attribute*</mat-label>
+                    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+                    </mat-icon>
+                    <mat-select matInput [formControl]="attribute" multiple>
+                        <mat-option *ngFor="let item of attributes" [value]="item.id">{{item.name}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="modal-footer mt-4">
+                <button mat-flat-button [color]="'primary'" (click)="onSubmit()"
+                    class="btn btn-primary" type="button"> {{selectedType ? 'Update' : 'Save'}}</button>
+            </div>
+        </div>
+    </div>
+</ng-template>

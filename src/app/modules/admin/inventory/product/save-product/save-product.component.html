@@ -1,0 +1,126 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
+  <div
+    class="relative flex-wrap flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+    <div class="text-4xl font-extrabold tracking-tight">
+      {{selectedProduct ? 'Edit' : 'Add'}} Product
+    </div>
+    <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+      <button [routerLink]="['/admin/products']" mat-flat-button [color]="'accent'" style="background-color: #1b2535 !important;">
+        <mat-icon [svgIcon]="'heroicons_solid:arrow-left'"></mat-icon>
+        <span class="ml-2 mr-1">Back</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-auto overflow-hidden">
+    <div class="flex flex-col flex-auto overflow-hidden sm:overflow-y-auto">
+      <div class="bg-card shadow rounded p-5 m-5 border">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <fuse-alert *ngIf="userForm.invalid && formSubmitted" class="my-3" [appearance]="'outline'" [type]="'warning'">
+          Please fill in all the required fields.
+        </fuse-alert>
+        <form (ngSubmit)="onSubmit()" [formGroup]="userForm">
+          <mat-horizontal-stepper [linear]="true" #horizontalStepper>
+            <mat-step>
+              <ng-template matStepLabel>
+                <div class="text-1xl font-extrabold tracking-tight">Basic Information</div>
+              </ng-template>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="fuse-mat-no-subscript w-full">
+                  <search-product-category formControlName="category"></search-product-category>
+                </div>
+                <div class="fuse-mat-no-subscript w-full">
+                  <search-product-brand formControlName="brand"></search-product-brand>
+                </div>
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                  <mat-label>Name*</mat-label>
+                  <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'">
+                  </mat-icon>
+                  <input matInput [formControlName]="'name'" [placeholder]="'Name'" [spellcheck]="false">
+                </mat-form-field>
+
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                  <mat-label>Product Type*</mat-label>
+                  <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+                  </mat-icon>
+                  <mat-select matInput formControlName="productType">
+                      <mat-option *ngFor="let item of productTypes" [value]="item.id">{{item.name}}</mat-option>
+                  </mat-select>
+              </mat-form-field>
+
+                <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                  <mat-label>Tax</mat-label>
+                  <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:clipboard-list'">
+                  </mat-icon>
+                  <mat-select matInput formControlName="tax"  placeholder="Tax" >
+                    <mat-option *ngIf="taxes?.length<1" [value]="null" routerLink="/admin/business-account/edit/tax/add/basic">Add Tax</mat-option>
+                    <mat-option *ngFor="let item of taxes" [value]="item.id">{{item.rate}}</mat-option>
+                </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                  <mat-label>Unit Price*</mat-label>
+                  <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:user-circle'">
+                  </mat-icon>
+                  <input decimalNumber matInput [formControlName]="'unitPrice'" [placeholder]="'Unit Price'" [spellcheck]="false">
+              </mat-form-field>
+
+                <mat-form-field class="fuse-mat-no-subscript w-full">
+                  <mat-label>Select Currency*</mat-label>
+                  <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                      [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                  <mat-select matInput formControlName="currency">
+                      <mat-option *ngFor="let option of currencyList" [value]="option">{{option}}
+                      </mat-option>
+                  </mat-select>
+              </mat-form-field>
+
+                <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                  <mat-label>Stock Control</mat-label>
+                  <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:chart-bar'">
+                  </mat-icon>
+                  <mat-select matInput [formControlName]="'stockControl'" [placeholder]="'Stock Control'">
+                    <mat-option *ngFor="let option of stockControl" [value]="option.name">{{option.label}}
+                    </mat-option>
+                </mat-select>
+                </mat-form-field>
+                <mat-form-field class="relative">
+                  <mat-label>Store</mat-label>
+                  <mat-select [formControlName]="'storeCtrl'" 
+                  placeholder="Store" 
+                  [multiple]="false"  
+              >
+                    <mat-option>
+                      <ngx-mat-select-search placeholderLabel="Find Store..." 
+                      noEntriesFoundLabel="No matching store found" [formControlName]="'storeFilterCtrl'"></ngx-mat-select-search>
+                    </mat-option>              
+                    <mat-option *ngFor="let item of filterStores | async" [value]="item.id">
+                      {{item.name}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <div class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                  <mat-checkbox class="example-margin" [formControlName]="'ageRestriction'">Age Restriction
+                  </mat-checkbox>
+                </div>
+              </div>
+              <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript mt-4 w-full">
+                <mat-label>Description</mat-label>
+                <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+                </mat-icon>
+                <textarea matInput [formControlName]="'description'" [placeholder]="'Description'" [rows]="5"
+                  [spellcheck]="false" matTextareaAutosize></textarea>
+              </mat-form-field>
+              <div class="flex justify-end mt-4">
+                <button mat-flat-button [color]="'primary'" class="btn btn-primary" type="submit">Save</button>
+              </div>
+            </mat-step>
+          </mat-horizontal-stepper>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

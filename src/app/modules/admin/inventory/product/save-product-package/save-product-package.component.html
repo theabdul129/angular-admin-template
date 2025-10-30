@@ -1,0 +1,51 @@
+<form [formGroup]="form">
+  <div class="grid grid-cols-2 gap-4">
+    <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+      <mat-label>Height*</mat-label>
+      <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'"></mat-icon>
+      <input matInput [formControlName]="'height'" [placeholder]="'Height'" />
+    </mat-form-field>
+
+    <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+      <mat-label>Width*</mat-label>
+      <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'"></mat-icon>
+      <input matInput [formControlName]="'width'" [placeholder]="'Width'" />
+    </mat-form-field>
+
+    <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+      <mat-label>Length*</mat-label>
+      <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'"></mat-icon>
+      <input matInput [formControlName]="'length'" [placeholder]="'Length'" />
+    </mat-form-field>
+
+    <mat-form-field class="fuse-mat-no-subscript w-full">
+      <mat-label>Dimensions Unit*</mat-label>
+      <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+      <mat-select matInput formControlName="dimensionUom">
+        <mat-option value="mm">Millimetre</mat-option>
+        <mat-option value="cm">Centimeters</mat-option>
+        <mat-option value="in">Inches</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+      <mat-label>Weight*</mat-label>
+      <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'"></mat-icon>
+      <input matInput [formControlName]="'weight'" [placeholder]="'Weight'" />
+    </mat-form-field>
+    
+    <mat-form-field class="fuse-mat-no-subscript w-full">
+      <mat-label>Weight Unit*</mat-label>
+      <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+      <mat-select matInput formControlName="weightUom">
+        <mat-option value="g">Grams</mat-option>
+        <mat-option value="kg">Kilograms</mat-option>
+        <mat-option value="lb">Pounds</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="modal-footer mt-4">
+    <button mat-flat-button [color]="'warn'" (click)="onArchive()" *ngIf="packageDimension" class="btn btn-warning mr-2" type="button">Archive</button>
+    <button [disabled]="form.invalid || isLoading" mat-flat-button [color]="'primary'" (click)="onSubmit()" class="btn btn-primary" type="button">Save</button>
+  </div>
+</form>

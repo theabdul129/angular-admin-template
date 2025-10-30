@@ -1,0 +1,69 @@
+<div class="flex flex-col flex-auto min-w-0 bg-card dark:bg-transparent">
+    <div
+      class="relative flex-wrap flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+      <div class="text-4xl font-extrabold tracking-tight">
+        {{selectedlender ? 'Edit' : 'Add'}} Lender Product
+      </div>
+      <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+        <button [routerLink]="['/admin/lenders']" mat-flat-button [color]="'accent'">
+          <mat-icon [svgIcon]="'heroicons_solid:arrow-left'"></mat-icon>
+          <span class="ml-2 mr-1">Back</span>
+        </button>
+      </div>
+    </div>
+    <div class="flex flex-auto overflow-hidden">
+        <div class="flex flex-col flex-auto overflow-hidden sm:overflow-y-auto">
+          <div class="bg-card shadow rounded p-5 m-5 border">
+            <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+            <fuse-alert *ngIf="lenderproductForm.invalid && formSubmitted" class="my-3" [appearance]="'outline'" [type]="'warning'">
+                Please fill in all the required fields.
+              </fuse-alert>
+              <form (ngSubmit)="onSubmit()" [formGroup]="lenderproductForm" class="p-6 rounded border bg-white">
+
+                <div class="grid grid-cols-2 gap-4">
+    
+                    <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                        <mat-label>Product Name*</mat-label>
+                        <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+                        </mat-icon>
+                        <input matInput [formControlName]="'productName'" [placeholder]="'Product Name'" />
+                    </mat-form-field>
+    
+                    <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                        <mat-label>Interest Rate*</mat-label>
+                        <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+                        </mat-icon>
+                        <input matInput [formControlName]="'interestRate'" [placeholder]="'Interest Rate'" />
+                    </mat-form-field>
+    
+                    <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+                        <mat-label>Max Term Period*</mat-label>
+                        <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:menu-alt-2'">
+                        </mat-icon>
+                        <input matInput [formControlName]="'maxTermPeriod'" [placeholder]="'Max Term Period'" />
+                    </mat-form-field>
+    
+                    <mat-form-field class="fuse-mat-no-subscript w-full">
+                        <mat-label>Interest Rate Type*</mat-label>
+                        <mat-icon matPrefix class="hidden sm:flex icon-size-5"
+                            [svgIcon]="'heroicons_solid:office-building'"></mat-icon>
+                        <mat-select matInput [formControlName]="'interestRateType'">
+                            <mat-option *ngFor="let option of insterestRateTypesList" [value]="option">{{option}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+    
+                </div>
+               
+                <div class="text-right">
+                    <button class="ml-auto" mat-button [matTooltip]="'Cancel'" [routerLink]="['/admin/lenders']"> Cancel
+                    </button>
+                    <button mat-flat-button [color]="'primary'" class="mt-4 btn btn-primary" type="submit">
+                          {{selectedlender ? 'Update': 'Save'}} 
+                    </button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>

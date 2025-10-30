@@ -1,0 +1,77 @@
+<div class="flex flex-col flex-auto w-full">
+    <div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+
+        <div class="relative py-8 px-6 md:px-8 border-b">
+            <div class="">
+                <div class="text-4xl font-extrabold tracking-tight mb-2">
+                    Add Notification
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-auto overflow-hidden">
+            <div class="flex flex-col flex-auto overflow-hidden sm:overflow-y-auto relative">
+                <fuse-alert *ngIf="form.invalid && formSubmitted" class="my-3 mx-7" [appearance]="'outline'"
+                [type]="'warning'">
+                Please fill in all the required fields.
+            </fuse-alert>
+                <form class="p-6" [formGroup]="form">
+                    <mat-stepper linear #stepper>
+                        <mat-step>
+                            <ng-template matStepLabel>Notification Body</ng-template>
+                            <div class="grid grid-cols-2 gap-4 mb-4 mt-5">
+                                <mat-form-field appearance="fill">
+                                  <mat-label>Notification Title</mat-label>
+                                  <input matInput formControlName="title" placeholder="Notification Title">
+                                </mat-form-field>
+                                <mat-form-field appearance="fill">
+                                    <mat-label>Notification Text</mat-label>
+                                    <input matInput formControlName="text" placeholder="Notification Text">
+                                  </mat-form-field>
+                                  <mat-form-field appearance="fill">
+                                    <mat-label>Notification Name</mat-label>
+                                    <input matInput formControlName="name" placeholder="Notification Name">
+                                  </mat-form-field>
+                                  <mat-form-field appearance="fill">
+                                    <mat-label>Notification Image</mat-label>
+                                    <input matInput formControlName="image" placeholder="Notification Image">
+                                  </mat-form-field>
+                            </div>
+                            <div>
+                              <button mat-flat-button [color]="'primary'" mat-button matStepperNext>Next</button>
+                            </div>
+                        </mat-step>
+                        <mat-step>
+                            <ng-template matStepLabel>Select Topic</ng-template>
+                            <div class="grid grid-cols-2 gap-4 mb-4 mt-5">
+                                <mat-form-field appearance="fill">
+                                  <mat-label>Notification Topic</mat-label>
+                                  <input matInput formControlName="topic" placeholder="Notification Topic">
+                                </mat-form-field>
+                            </div>
+                            <div>
+                              <button mat-flat-button [color]="'accent'" class="mr-2" mat-button matStepperPrevious>Back</button>
+                              <button mat-flat-button [color]="'primary'" mat-button matStepperNext>Next</button>
+                            </div>
+                        </mat-step>
+                        <mat-step>
+                            <ng-template matStepLabel>Scheduling</ng-template>
+                            <div class="grid grid-cols-2 gap-4 mb-4 mt-5">
+                                <mat-form-field class="fuse-mat-no-subscript w-full">
+                                    <mat-label>Scheduled</mat-label>
+                                    <input matInput [matDatepicker]="picker" [formControlName]="'schedule'">
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </mat-form-field>
+                            </div>
+                            <div>
+                              <button mat-flat-button [color]="'accent'" class="mr-2" mat-button matStepperPrevious>Back</button>
+                              <button (click)="onSubmit()" mat-flat-button [color]="'primary'" mat-button type="submit">Submit</button>
+                            </div>
+                        </mat-step>
+                    </mat-stepper>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

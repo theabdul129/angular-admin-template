@@ -1,0 +1,46 @@
+<div class="flex flex-col flex-auto min-w-0" *ngIf="!reaInitialize">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                   <span class="cursor-pointer" routerLink="/admin/connectors">
+                    <mat-icon class="material-symbols-outlined">
+                        arrow_back
+                    </mat-icon>
+                   </span> Connectors
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-auto p-6 sm:p-8">
+        <div class="row">
+            <div class="col-md-4 col-sm-6 col-12 mt-2" *ngFor="let item of connectorsList">
+                <div class="_card px-4 py-3 cursor-pointer hover" (click)="goToForm(item?.formEnv, item.label,item?.sourceName)">
+                    <div class="flex justify-between items-center">
+                        <div class="image">
+                            <img [src]="item?.imageUrl" alt="">
+                        </div>
+                        <p class="m-0 pl-2 text-center">{{item?.label}}</p>
+                    </div>
+                    <div class="descr">
+                        <!-- {{item?.description}} -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="flex flex-col flex-auto min-w-0" *ngIf="reaInitialize">
+    <app-third-party-resource (saved)="cancel()" *ngIf="reaInitialize" [pageTitle]="pageTitle"
+        [connector]="connector" [label]="'Source name'" [sourceType]="sourceType"></app-third-party-resource>
+</div>

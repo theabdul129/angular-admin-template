@@ -1,0 +1,65 @@
+<div class="flex flex-col w-full max-w-screen-xl mx-auto px-6 sm:px-8">
+    <div class="flex flex-col sm:flex-row sm:items-center min-w-0 md:my-6 sm:my-12">
+        <div class="flex flex-auto items-center min-w-0">
+            <div class="flex flex-col min-w-0 ml-4">
+                <div class="text-lg md:text-3xl font-bold leading-7 md:leading-snug truncate ng-star-inserted">
+                    Notes</div>
+            </div>
+        </div>
+        <div class="flex items-center mt-6 sm:mt-0 sm:ml-2 space-x-3">
+            <button mat-button class="bg-red-500 rounded text-white ml-2 mat-flat-button mat-button-base mat-warn"
+                (click)="openModal(addNotes)">Add
+                Notes</button>
+        </div>
+    </div>
+
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 shadow-none">
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef> Date</th>
+            <td mat-cell *matCellDef="let element"> {{element.createdAt | date: 'MMM dd, yy, hh:mm a' || 'N/A'|| 'N/A'}}
+            </td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="content">
+            <th mat-header-cell *matHeaderCellDef> Content </th>
+            <td mat-cell *matCellDef="let element"> {{element.text}} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <fuse-alert class="my-4" *ngIf="errorMsg || (dataSource && dataSource.length ==0)" [appearance]="'outline'"
+        [type]="'warning'">
+        {{errorMsg ? errorMsg : 'No records found'}}
+    </fuse-alert>
+
+</div>
+<ng-template #addNotes let-modal>
+    <div class="modal-header">
+        <h4 class="mat-dialog-title text-3xl">Add Notes</h4>
+        <button (click)="closeModal()" aria-describedby="modal-title" class="close" type="button">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form class="example-form my-3" [formGroup]="userForm" (ngSubmit)="onSubmit()">
+            <div class="flex justify-between">
+
+                <mat-form-field class="example-full-width col">
+                    <mat-label>Comments</mat-label>
+                    <textarea matInput formControlName="comments"></textarea>
+                </mat-form-field>
+
+            </div>
+            <div class="text-left">
+                <button mat-flat-button [color]="'primary'" class="mt-4 btn btn-primary" type="submit">Add
+                    Notes</button>
+            </div>
+        </form>
+
+    </div>
+
+</ng-template>

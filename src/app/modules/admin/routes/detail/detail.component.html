@@ -1,0 +1,115 @@
+<div class="flex flex-col flex-auto min-w-0">
+
+    <!-- Header -->
+    <div
+        class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a [routerLink]="['/admin/routes']" class="whitespace-nowrap text-primary-500">Routes</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon class="icon-size-5 text-secondary" [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">Details</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    Route Details
+                </h2>
+                <div class="mt-3">
+                    <mat-form-field class="fuse-mat-no-subscript" style="width: 250px;">
+                        <mat-label>Choose Date</mat-label>
+                        <input [(ngModel)]="routeDate" (dateChange)="dateChange()" matInput [matDatepicker]="picker">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                    <button class="ml-2" (click)="clear()" mat-flat-button [color]="'primary'">
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-auto">
+        <mat-spinner *ngIf="isLoadingObs | async" class="absolute h-full w-full"></mat-spinner>
+        <div class="flex" *ngIf="routeData">
+            <div class="flex-none w-64">
+                <div class="py-6 px-3 bg-card">
+                    <div>
+                        <img style="width: 100px; height: auto; object-fit: cover;" class="mx-auto rounded-full border"
+                            [src]="routeData.courier.profileImagePublicUrl"
+                            onError="this.src='assets/images/no-image.jpg'" />
+                        <div class="font-medium text-center my-3">{{routeData.courier.firstName}} <span
+                                *ngIf="routeData.courier.surname">{{routeData.courier.surname}}</span></div>
+                        <div>Email: {{routeData.courier.emailAddress ? routeData.courier.emailAddress : 'N/A'}}
+                        </div>
+                        <div>Phone: {{routeData.courier.primaryPhone ? routeData.courier.primaryPhone : 'N/A'}}
+                        </div>
+                    </div>
+                    <div class="text-center pb-3 border-b my-3">
+                        <button mat-flat-button [color]="'primary'" class="">Edit</button>
+                        <button mat-flat-button [color]="'warn'" class="ml-2">Delete</button>
+                    </div>
+                    <div class="font-medium">Routes</div>
+                    <ol>
+                        <li *ngFor="let route of routeData.routeOrders" class="relative flex py-7">
+                            <div class="relative flex flex-auto">
+                                <div
+                                    class="text-white flex flex-shrink-0 items-center justify-center w-10 h-10 mr-4 rounded-full bg-gray-400">
+                                    {{route.routeIndex}}
+                                </div>
+                                <div class="flex flex-col flex-auto items-start">
+                                    <div class="text-md leading-5">
+                                        <div class="p-3 rounded-lg bg-gray-200 dark:bg-gray-800">
+                                            <div *ngIf="route.startingAddress">
+                                                Arrival From: {{route.startingAddress.address.address1 +', '+
+                                                route.startingAddress.address.city +', '+
+                                                route.startingAddress.address.postcode}} <br>
+                                                Arrival Time: {{route.estimatedArrivalTimeStart | date: 'MMM d, y, h:mm
+                                                a'}}
+                                            </div>
+                                            <div class="border-b py-3 border-t" *ngIf="route.destinationAddress">
+                                                Departure at: {{route.destinationAddress.address.address1 +', '+
+                                                route.destinationAddress.address.city +', '+
+                                                route.destinationAddress.address.postcode}}<br>
+
+                                                Departure Time: {{route.estimatedArrivalTimeFinish | date: 'MMM d, y,
+                                                h:mm a'}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <div class="flex-auto">
+                <div style="height: 500px;" id="map">
+                    <!-- <agm-map [zoom]="zoom" [latitude]="routeData.courier.lastKnownLocation.latitude"
+                        [longitude]="routeData.courier.lastKnownLocation.longitude" class="h-full">
+                        <agm-polyline *ngFor="let route of routeData.routeOrders" [editable]="false" [strokeColor]="'green'"
+                            [strokeWeight]="'5'">
+                            <agm-icon-sequence [strokeColor]="'green'" [repeat]="'10px'" [offset]="0" [strokeWeight]="3"
+                                [scale]="2" [strokeOpacity]="100" [path]="'M 0,-1 0,1'">
+                            </agm-icon-sequence>
+                            <agm-polyline-point [latitude]="route.startingAddress.address.latitude"
+                                [longitude]="route.startingAddress.address.longitude"></agm-polyline-point>
+                            <agm-polyline-point [latitude]="routeData.courier.lastKnownLocation.latitude"
+                                [longitude]="routeData.courier.lastKnownLocation.longitude"></agm-polyline-point>
+                            <agm-polyline-point [latitude]="route.destinationAddress?.address.latitude"
+                                [longitude]="route.destinationAddress?.address.longitude"></agm-polyline-point>
+                        </agm-polyline>
+                    </agm-map> -->
+                </div>
+            </div>
+        </div>
+        <fuse-alert class="m-7" *ngIf="!routeData || routeData.length==0" [appearance]="'border'" [type]="'warning'">
+            No records found
+        </fuse-alert>
+    </div>
+</div>

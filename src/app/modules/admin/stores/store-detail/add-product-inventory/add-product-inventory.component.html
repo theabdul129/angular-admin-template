@@ -1,0 +1,18 @@
+<form [formGroup]="productInventoryForm">
+
+  <mat-form-field class="fuse-mat-no-subscript w-full">
+    <mat-label>GTIN</mat-label>
+    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'"></mat-icon>
+    <input matInput [formControlName]="'gtin'" [placeholder]="'GTIN'" [spellcheck]="false">
+  </mat-form-field>
+
+  <mat-form-field class="fuse-mat-no-subscript w-full my-4">
+    <mat-label>Quantity</mat-label>
+    <mat-icon matPrefix class="hidden sm:flex icon-size-5" [svgIcon]="'heroicons_solid:globe'"></mat-icon>
+    <input matInput [formControlName]="'quantity'" [placeholder]="'Quantity'" [spellcheck]="false">
+  </mat-form-field>
+
+  <div class="modal-footer">
+    <button mat-flat-button [color]="'primary'" (click)="onSubmit()" class="btn btn-primary" type="button">Save</button>
+  </div>
+</form>

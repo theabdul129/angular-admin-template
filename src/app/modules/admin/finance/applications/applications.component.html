@@ -1,0 +1,50 @@
+<div class="flex flex-col flex-auto min-w-0">
+  <div class="flex-auto">
+    <div class="flex flex-auto overflow-hidden">
+      <div class="flex flex-col flex-auto overflow-hidden sm:overflow-y-auto relative">
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 shadow-none">
+
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date </th>
+            <td mat-cell *matCellDef="let element"> {{element?.createdAt | date: 'MMM dd, yy, hh:mm a' }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="fullName">
+            <th mat-header-cell *matHeaderCellDef>Full name </th>
+            <td mat-cell *matCellDef="let element"> {{(element?.userDetail?.firstName||'') + ' ' + (element?.userDetail?.surname||'')}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="loanTerm">
+            <th mat-header-cell *matHeaderCellDef>Loan term </th>
+            <td mat-cell *matCellDef="let element"> {{element?.loanTerm}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="deposit">
+            <th mat-header-cell *matHeaderCellDef>Deposit </th>
+            <td mat-cell *matCellDef="let element"> {{element?.deposit/100 | currency:'GBP':'symbol':'1.0-0'}}  </td>
+          </ng-container>
+
+          <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef>Reference </th>
+            <td mat-cell *matCellDef="let element"> {{element?.reference}} </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="example-element-row cursor-pointer hover:bg-gray-100" (click)="selectedApplication(row)">
+          </tr>
+        </table>
+
+        <fuse-alert class="m-4" *ngIf=" errorMsg || (dataSource && dataSource?.length ==0)" [appearance]="'outline'"
+          [type]="'warning'">
+          {{errorMsg ? errorMsg : 'No records found'}}
+        </fuse-alert>
+
+        <mat-paginator [length]="tableAttributes.totalRecords" (page)="paginate($event)"
+          [pageSizeOptions]="tableAttributes.pageSizeOptions" [pageSize]="tableAttributes.pageSize" showFirstLastButtons
+          aria-label="Select page">
+        </mat-paginator>
+        
+      </div>
+    </div>
+  </div>
+</div>
